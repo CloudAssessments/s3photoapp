@@ -9,7 +9,6 @@ module.exports = {
       objects: "always-multiline",
       imports: "always-multiline",
       exports: "always-multiline",
-      // Deviating from AirBnB here b/c Node LTS does NOT like these dang
       functions: "never",
     }],
     "consistent-return": "off",
