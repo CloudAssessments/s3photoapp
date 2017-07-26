@@ -16,10 +16,10 @@ const sendServerError = res => res.status(500).json({ code: 'InternalServerError
 
 module.exports = deps => (req, res) => {
   try {
-    req.pipe(req.busboy);
     req.busboy.on('file', (_, Body, Key) => {
       if (!isValidFilename(Key)) {
         return res.status(400).json({
+          code: 'InvalidFileName',
           message: 'Name of file is invalid. Must be jpg, png, or bmp',
         });
       }
@@ -29,7 +29,7 @@ module.exports = deps => (req, res) => {
           res.json({
             bucket: result.Bucket,
             key: result.key,
-            url: result.Location,
+            location: result.Location,
           });
         })
         .catch((e) => {
@@ -44,5 +44,6 @@ module.exports = deps => (req, res) => {
           sendServerError(res);
         });
     });
+    req.pipe(req.busboy);
   } catch (e) { sendServerError(res); }
 };

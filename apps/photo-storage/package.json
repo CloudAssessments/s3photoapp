@@ -4,7 +4,6 @@
   "description": "A microservice to upload and get images from Amazon S3",
   "main": "server.js",
   "scripts": {
-    "dev": "STAGE=dev nodemon server.js",
     "lint": "eslint",
     "test": "STAGE=test nyc -r text -r html ava -T 300000"
   },
