@@ -1,4 +1,5 @@
 const isValidFilename = key => key.match(/\w.+(jpg|png|bmp)$/);
+const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
 
 module.exports = deps => (req, res) => {
   try {
@@ -19,26 +20,16 @@ module.exports = deps => (req, res) => {
           });
         })
         .catch((e) => {
-          if (e.statusCode === 403) {
-            // {
-            //     "code": "AccessDenied",
-            //     "message": "Access Denied"
-            // }
-
-            // {
-            //     "code": "InvalidAccessKeyId",
-            //     "message": "The AWS Access Key Id you provided does not exist in our records."
-            // }
-
-            // {
-            //     "code": "SignatureDoesNotMatch",
-            //     "message": "The request signature we calculated does not match the signature you provided. Check your key and signing method."
-            // }
-            return res.status(403).json({ code: e.code, message: e.message });
+          // surface errors from s3
+          if (e.statusCode && e.code && e.message) {
+            return res.status(e.statusCode).json({
+              code: e.code,
+              message: e.message,
+            });
           }
 
-          return res.status(500).send({ code: 'InternalServerError' });
+          sendServerError(res);
         });
     });
-  } catch (e) { return res.status(500).send({ code: 'InternalServerError' }); }
+  } catch (e) { sendServerError(res); }
 };
