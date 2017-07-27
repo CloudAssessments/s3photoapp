@@ -79,7 +79,6 @@ test.cb('should surface s3 errors if thrown', (t) => {
   t.context.mockRes.json
     .once()
     .callsFake((response) => {
-      console.log('debugT2', response);
       t.is(response.code, s3Error.code);
       t.is(response.message, s3Error.message);
       verifyMocks(t);
