@@ -18,6 +18,9 @@ app.post(
   require('./middleware/upload')(DEPS)
 );
 
+// Endpoint: List Photo URLs
+app.get('/bucket/:bucket/photos', require('./middleware/listUrls')(DEPS));
+
 // Endpoint: Get Photo URL
 app.get('/bucket/:bucket/photos/:photo', require('./middleware/getUrl')(DEPS));
 
