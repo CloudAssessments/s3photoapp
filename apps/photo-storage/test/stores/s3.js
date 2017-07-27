@@ -69,7 +69,7 @@ test('getUrl should get a url for a photo', (t) => {
       return cb(null, testUrl);
     });
 
-  return s3StoreWithConn(t.context.mockS3).getUrl(testBucket, testKey)
+  return s3StoreWithConn(t.context.mockS3).getPhotoUrl(testBucket, testKey)
     .then((res) => {
       t.is(res, testUrl);
       t.context.mockS3.getSignedUrl.verify();
@@ -90,11 +90,14 @@ test('getUrl should if error occurs', (t) => {
       return cb(new Error('oops'), null);
     });
 
-  return t.throws(s3StoreWithConn(t.context.mockS3).getUrl(testBucket, testKey), 'oops')
+  return t.throws(
+    s3StoreWithConn(t.context.mockS3).getPhotoUrl(testBucket, testKey),
+    'oops'
+  )
     .then(() => t.context.mockS3.getSignedUrl.verify());
 });
 
-test('list should get a list of urls for photos in a bucket', (t) => {
+test('listPhotos should get a list of urls for photos in a bucket', (t) => {
   const params = {
     Bucket: generatedBucketName,
     MaxKeys: 12,
@@ -118,14 +121,14 @@ test('list should get a list of urls for photos in a bucket', (t) => {
         .resolves(listRes),
     });
 
-  return s3StoreWithConn(t.context.mockS3).list(testBucket)
+  return s3StoreWithConn(t.context.mockS3).listPhotos(testBucket)
     .then((res) => {
       t.deepEqual(res, listRes);
       t.context.mockS3.listObjectsV2.verify();
     });
 });
 
-test('list should accept an optional limit and cursor', (t) => {
+test('listPhotos should accept an optional limit and cursor', (t) => {
   const params = {
     Bucket: generatedBucketName,
     MaxKeys: 2,
@@ -150,14 +153,14 @@ test('list should accept an optional limit and cursor', (t) => {
         .resolves(listRes),
     });
 
-  return s3StoreWithConn(t.context.mockS3).list(testBucket, 2, 'testCursor')
+  return s3StoreWithConn(t.context.mockS3).listPhotos(testBucket, 2, 'testCursor')
     .then((res) => {
       t.deepEqual(res, listRes);
       t.context.mockS3.listObjectsV2.verify();
     });
 });
 
-test('upload should upload a photo', (t) => {
+test('uploadPhoto should upload a photo', (t) => {
   const params = {
     ContentType: 'image',
     Bucket: generatedBucketName,
@@ -180,7 +183,7 @@ test('upload should upload a photo', (t) => {
         .resolves(uploadRes),
     });
 
-  return s3StoreWithConn(t.context.mockS3).upload(
+  return s3StoreWithConn(t.context.mockS3).uploadPhoto(
     testBucket,
     { Key: testKey, Body: 'imageBody' }
   )

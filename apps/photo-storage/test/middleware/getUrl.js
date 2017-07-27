@@ -18,7 +18,7 @@ const getUrl = require('../../middleware/getUrl.js');
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockS3Store.getUrl.verify();
+  t.context.mockS3Store.getPhotoUrl.verify();
 };
 
 test.beforeEach((t) => {
@@ -31,14 +31,14 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
-    getUrl: sinon.mock(),
+    getPhotoUrl: sinon.mock(),
   };
 });
 
 test.cb('should return url if bucket and photo exists', (t) => {
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .once()
     .withArgs('testBucket', 'testPhoto')
     .resolves('www.aws.randomurl.com');
@@ -66,7 +66,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
 
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .once()
     .withArgs('testBucket', 'testPhoto')
     .rejects(s3Error);
@@ -91,7 +91,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .once()
     .withArgs('testBucket', 'testPhoto')
     .rejects(new Error('oops'));

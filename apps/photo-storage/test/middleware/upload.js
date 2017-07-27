@@ -20,7 +20,7 @@ const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
   t.context.mockReq.pipe.verify();
-  t.context.mockS3Store.upload.verify();
+  t.context.mockS3Store.uploadPhoto.verify();
 };
 
 test.beforeEach((t) => {
@@ -38,7 +38,7 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
-    upload: sinon.mock(),
+    uploadPhoto: sinon.mock(),
   };
 });
 
@@ -58,7 +58,7 @@ test.cb('should return upload details on success', (t) => {
       busboy.emit('file', null, 'testBody', uploadRes.key);
     });
 
-  t.context.mockS3Store.upload
+  t.context.mockS3Store.uploadPhoto
     .once()
     .withArgs(uploadRes.Bucket, { Body: 'testBody', Key: uploadRes.key })
     .resolves(uploadRes);
@@ -94,7 +94,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
       busboy.emit('file', null, 'testBody', 'testKey.jpg');
     });
 
-  t.context.mockS3Store.upload
+  t.context.mockS3Store.uploadPhoto
     .once()
     .withArgs('testBucket', { Body: 'testBody', Key: 'testKey.jpg' })
     .rejects(s3Error);
@@ -117,7 +117,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
 });
 
 test.cb('should return validation error if filename is invalid', (t) => {
-  t.context.mockS3Store.upload.never();
+  t.context.mockS3Store.uploadPhoto.never();
 
   t.context.mockReq.pipe
     .once()
@@ -154,7 +154,7 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
 
   t.context.mockReq.pipe.atMost(1);
 
-  t.context.mockS3Store.upload
+  t.context.mockS3Store.uploadPhoto
     .once()
     .rejects(new Error('foo'));
 
@@ -176,7 +176,7 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
 
 
 test.cb('should return 500 statusCode if unexpected thrown error', (t) => {
-  t.context.mockS3Store.upload.never();
+  t.context.mockS3Store.uploadPhoto.never();
 
   t.context.mockReq.pipe
     .once()

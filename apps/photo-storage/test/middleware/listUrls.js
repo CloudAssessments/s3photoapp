@@ -18,8 +18,8 @@ const listUrls = require('../../middleware/listUrls.js');
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockS3Store.getUrl.verify();
-  t.context.mockS3Store.list.verify();
+  t.context.mockS3Store.getPhotoUrl.verify();
+  t.context.mockS3Store.listPhotos.verify();
 };
 
 test.beforeEach((t) => {
@@ -32,8 +32,8 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
-    getUrl: sinon.mock(),
-    list: sinon.mock(),
+    getPhotoUrl: sinon.mock(),
+    listPhotos: sinon.mock(),
   };
 });
 
@@ -59,12 +59,12 @@ test.cb('should return list of urls', (t) => {
     KeyCount: 2,
   };
 
-  t.context.mockS3Store.list
+  t.context.mockS3Store.listPhotos
     .once()
     .withArgs('testBucket', undefined, undefined)
     .resolves(listRes);
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .exactly(listRes.Contents.length)
     .callsFake((bucket, key) => Promise.resolve(`www.aws-url.com/${key}`));
 
@@ -106,12 +106,12 @@ test.cb('should take an optional limit', (t) => {
     NextContinuationToken: '6ypcgUsc7MDg',
   };
 
-  t.context.mockS3Store.list
+  t.context.mockS3Store.listPhotos
     .once()
     .withArgs('testBucket', 3, undefined)
     .resolves(listRes);
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .exactly(listRes.Contents.length)
     .callsFake((bucket, key) => Promise.resolve(`www.aws-url.com/${key}`));
 
@@ -145,12 +145,12 @@ test.cb('should accept an optional cursor', (t) => {
     StartAfter: 'asdf',
   };
 
-  t.context.mockS3Store.list
+  t.context.mockS3Store.listPhotos
     .once()
     .withArgs('testBucket', undefined, 'asdf')
     .resolves(listRes);
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.getPhotoUrl
     .exactly(listRes.Contents.length)
     .callsFake((bucket, key) => Promise.resolve(`www.aws-url.com/${key}`));
 
@@ -177,12 +177,12 @@ test.cb('should surface s3 errors if thrown', (t) => {
     message: 'The AWS Access Key Id you provided does not exist in our records.',
   };
 
-  t.context.mockS3Store.list
+  t.context.mockS3Store.listPhotos
     .once()
     .withArgs('testBucket', undefined, undefined)
     .rejects(s3Error);
 
-  t.context.mockS3Store.getUrl.never();
+  t.context.mockS3Store.getPhotoUrl.never();
 
   t.context.mockRes.status
     .once()
@@ -205,12 +205,12 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const params = { bucket: 'testBucket' };
   const req = { params, query: {} };
 
-  t.context.mockS3Store.list
+  t.context.mockS3Store.listPhotos
     .once()
     .withArgs('testBucket', undefined, undefined)
     .rejects(new Error('oops'));
 
-  t.context.mockS3Store.getUrl.never();
+  t.context.mockS3Store.getPhotoUrl.never();
 
   t.context.mockRes.status
     .once()

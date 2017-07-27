@@ -12,7 +12,7 @@ const deletePhoto = s3 => (bucketName, key) => {
   return s3.deleteObject(params).promise();
 };
 
-const getUrl = s3 => (bucketName, key) => new Promise((resolve, reject) => {
+const getPhotoUrl = s3 => (bucketName, key) => new Promise((resolve, reject) => {
   const params = { Bucket: generateBucketName(bucketName), Key: key };
   return s3.getSignedUrl('getObject', params, (err, url) => {
     if (err) {
@@ -22,7 +22,7 @@ const getUrl = s3 => (bucketName, key) => new Promise((resolve, reject) => {
   });
 });
 
-const list = s3 => (bucketName, limit, cursor) => {
+const listPhotos = s3 => (bucketName, limit, cursor) => {
   const params = Object.assign(
     { Bucket: generateBucketName(bucketName) },
     limit ? { MaxKeys: limit } : { MaxKeys: 12 },
@@ -32,7 +32,7 @@ const list = s3 => (bucketName, limit, cursor) => {
   return s3.listObjectsV2(params).promise();
 };
 
-const upload = s3 => (bucketName, data) => {
+const uploadPhoto = s3 => (bucketName, data) => {
   const params = {
     ContentType: 'image',
     Bucket: generateBucketName(bucketName),
@@ -44,13 +44,14 @@ const upload = s3 => (bucketName, data) => {
 };
 
 module.exports = function s3Store(s3Conn) {
+  /* istanbul ignore next */
   const s3 = s3Conn || new AWS.S3();
 
   return {
     assertBucket: assertBucket(s3),
     deletePhoto: deletePhoto(s3),
-    getUrl: getUrl(s3),
-    list: list(s3),
-    upload: upload(s3),
+    getPhotoUrl: getPhotoUrl(s3),
+    listPhotos: listPhotos(s3),
+    uploadPhoto: uploadPhoto(s3),
   };
 };
