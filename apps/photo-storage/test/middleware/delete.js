@@ -13,12 +13,12 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const getUrl = require('../../middleware/getUrl.js');
+const del = require('../../middleware/delete.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockS3Store.getUrl.verify();
+  t.context.mockS3Store.deletePhoto.verify();
 };
 
 test.beforeEach((t) => {
@@ -31,30 +31,34 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
-    getUrl: sinon.mock(),
+    deletePhoto: sinon.mock(),
   };
 });
 
 test.cb('should return url if bucket and photo exists', (t) => {
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.deletePhoto
     .once()
     .withArgs('testBucket', 'testPhoto')
-    .resolves('www.aws.randomurl.com');
+    .resolves({});
 
-  t.context.mockRes.status.never();
+  t.context.mockRes.status
+    .once()
+    .withArgs(204)
+    .returns(t.context.mockRes);
+
   t.context.mockRes.json.never();
 
   t.context.mockRes.send
     .once()
     .callsFake((response) => {
-      t.is(response, 'www.aws.randomurl.com');
+      t.is(response, undefined);
       verifyMocks(t);
       t.end();
     });
 
-  getUrl({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
 });
 
 test.cb('should surface s3 errors if thrown', (t) => {
@@ -66,7 +70,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
 
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.deletePhoto
     .once()
     .withArgs('testBucket', 'testPhoto')
     .rejects(s3Error);
@@ -86,13 +90,13 @@ test.cb('should surface s3 errors if thrown', (t) => {
       t.end();
     });
 
-  getUrl({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
 });
 
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const params = { bucket: 'testBucket', photo: 'testPhoto' };
 
-  t.context.mockS3Store.getUrl
+  t.context.mockS3Store.deletePhoto
     .once()
     .withArgs('testBucket', 'testPhoto')
     .rejects(new Error('oops'));
@@ -110,5 +114,5 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
       t.end();
     });
 
-  getUrl({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
 });
