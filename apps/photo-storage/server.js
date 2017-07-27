@@ -18,6 +18,9 @@ app.post(
   require('./middleware/upload')(DEPS)
 );
 
+// Endpoint: Delete Photo
+app.delete('/bucket/:bucket/photos/:photo', require('./middleware/delete')(DEPS));
+
 // Endpoint: Get Photo URL
 app.get('/bucket/:bucket/photos/:photo', require('./middleware/getUrl')(DEPS));
 
