@@ -18,6 +18,9 @@ app.post(
   require('./middleware/upload')(DEPS)
 );
 
+// Endpoint: Get Photo URL
+app.get('/bucket/:bucket/photos/:photo', require('./middleware/getUrl')(DEPS));
+
 // catch all if a path does not exist
 app.use((req, res) => {
   res.status(404).json({ code: 'RouteNotFound' });
