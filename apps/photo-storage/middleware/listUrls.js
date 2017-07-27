@@ -14,10 +14,10 @@
 const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
 
 module.exports = deps => (req, res) => {
-  deps.s3Store.list(req.params.bucket, req.query.limit, req.query.cursor)
+  deps.s3Store.listPhotos(req.params.bucket, req.query.limit, req.query.cursor)
     .then(result =>
       Promise.all(result.Contents.map(
-        obj => deps.s3Store.getUrl(req.params.bucket, obj.Key)
+        obj => deps.s3Store.getPhotoUrl(req.params.bucket, obj.Key)
       ))
         .then((urls) => {
           res.json({
