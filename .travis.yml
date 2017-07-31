@@ -17,5 +17,4 @@ before_install:
 install:
   - docker-compose build
 script:
-  - docker-compose run s3-photos make lint
-  - docker-compose run s3-photos make test
+  - docker-compose run s3-photos make lint; make test
