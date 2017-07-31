@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  p Welcome to the S3 Photo Storage Page!
+
+  .page-header
+    h1 #{bucket}
+  
+  .container.col-xs-12
+    if err
+      p Error: #{err}
+    if urls
+      for url in urls
+        .col-xs-2
+          .thumbnail
+            img(src=url)
