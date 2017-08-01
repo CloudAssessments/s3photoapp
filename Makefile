@@ -1,15 +1,17 @@
-# Other apps will be installed here when they exist
+clean:
+	cd apps/photo-storage && npm run clean;
+	cd apps/web-client && npm run clean;
+
 install:
 	cd apps/photo-storage && npm install -q;
-
-# Remove node_modules and generated files
-clean:
-	cd apps/photo-storage && rm -rf node_modules;
+	cd apps/web-client && npm install -q;
 
 lint:
 	cd apps/photo-storage && npm run lint .;
+	cd apps/web-client && npm run lint .;
 
 test:
 	cd apps/photo-storage && npm test;
+	cd apps/web-client && npm test;
 
-.PHONY: install
+.PHONY: clean install lint test
