@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const assertBucket = require('../../middleware/assertBucket.js');
+const assertBucket = require('../../routes/assertBucket.js');
 
 const verifyMocks = (t) => {
   t.context.mockS3Store.assertBucket.verify();

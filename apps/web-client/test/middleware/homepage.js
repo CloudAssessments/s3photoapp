@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const homepage = require('../../middleware/homepage.js');
+const homepage = require('../../routes/homepage.js');
 
 const testBucket = 'testBucket';
 

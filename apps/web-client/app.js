@@ -43,8 +43,8 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.get('/', require('./middleware/homepage'));
+app.get('/', require('./routes/homepage'));
 
-app.post('/photo', require('./middleware/upload'));
+app.post('/photo', require('./routes/upload'));
 
 module.exports = app;

@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const del = require('../../middleware/delete.js');
+const del = require('../../routes/delete.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
