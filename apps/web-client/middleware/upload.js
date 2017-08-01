@@ -21,8 +21,10 @@ module.exports = (req, res) => {
 
     pipe.on('error', (err) => {
       redirect(JSON.stringify({
-        message: err.message,
-        name: err.name,
+        err: {
+          message: err.message,
+          name: err.name,
+        },
       }));
     });
   } catch (e) {
