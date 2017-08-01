@@ -26,10 +26,10 @@ module.exports = (req, res) => {
         bodyJson = JSON.parse(body);
       } catch (e) {
         return res.render('index', {
-          err: {
+          err: JSON.stringify({
             code: 'ParseError',
             message: `Could not parse: ${body}`,
-          },
+          }),
         });
       }
 
@@ -40,7 +40,7 @@ module.exports = (req, res) => {
         });
       }
 
-      return res.render('index', { err: bodyJson });
+      return res.render('index', { err: body });
     }
 
     return res.render('index', { err: 'No response body' });
