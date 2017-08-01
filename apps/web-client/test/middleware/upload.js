@@ -83,12 +83,6 @@ test.cb('should redirect to homepage with upload response', (t) => {
 test.cb('should redirect to homepage if upload responds with no data', (t) => {
   let pipe;
 
-  const uploadRes = {
-    Bucket: 'testBucket',
-    key: 'testKey.jpg',
-    location: 'www.aws.s3/testBucket/testKey.jpg.com',
-  };
-
   const req = {
     pipe: t.context.mockPipe,
     deps: {
