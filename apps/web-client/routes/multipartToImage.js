@@ -11,8 +11,12 @@
   limitations under the License.
 */
 
+const validMimeTypes = ['image/bmp', 'image/jpeg', 'image/png'];
+
+const isValidImageMimeType = mimeType => validMimeTypes.includes(mimeType);
+
 module.exports = (req, res, next) => {
-  if (req.file && !req.file.mimetype.includes('image')) {
+  if (req.file && !isValidImageMimeType(req.file.mimetype)) {
     const err = JSON.stringify({
       code: 'InvalidMimeType',
       message: 'File must be a jpg, png, or bmp',

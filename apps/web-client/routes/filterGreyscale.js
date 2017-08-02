@@ -36,7 +36,7 @@ module.exports = (req, res, next) => {
 
     if (result.statusCode !== 200) {
       return buffer ?
-        redirect(JSON.stringify(buffer)) :
+        redirect(buffer.toString()) :
         redirect(JSON.stringify({ code: 'InternalServerError' }));
     }
 

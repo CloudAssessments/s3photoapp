@@ -12,7 +12,7 @@
 */
 
 module.exports = (req, res) => {
-  if (!req.body) {
+  if (!Buffer.isBuffer(req.body)) {
     return res.status(400).json({
       code: 'BadRequest',
       message: 'Unable to parse request. Verify your content-type to be of image/*',
