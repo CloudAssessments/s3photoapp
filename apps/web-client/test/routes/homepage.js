@@ -178,3 +178,27 @@ test.cb('should render index with err if getPhotos response body is not json', (
 
   homepage(req, t.context.mockRes);
 });
+
+test.cb('should render index with err if req query has err', (t) => {
+  const req = {
+    deps: {
+      photoApiUrl: 'http://localhost:test',
+      s3Bucket: testBucket,
+      request: t.context.mockRequest,
+    },
+    query: {
+      err: 'oops',
+    },
+  };
+
+  t.context.mockRequest.get.never();
+
+  t.context.mockRes.render
+    .callsFake((viewFile, ctx) => {
+      t.is(ctx.err, 'oops');
+      verifyMocks(t);
+      t.end();
+    });
+
+  homepage(req, t.context.mockRes);
+});

@@ -12,15 +12,13 @@
 */
 
 const { test } = require('ava');
-const EventEmitter = require('events');
 const sinon = require('sinon');
 const upload = require('../../routes/upload.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockReq.pipe.verify();
-  t.context.mockS3Store.uploadPhoto.verify();
+  t.context.mockReq.deps.s3Store.uploadPhoto.verify();
 };
 
 test.beforeEach((t) => {
@@ -32,35 +30,31 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq = {
-    pipe: sinon.mock(),
-    busboy: new EventEmitter(),
-  };
-
-  // eslint-disable-next-line no-param-reassign
-  t.context.mockS3Store = {
-    uploadPhoto: sinon.mock(),
+    deps: {
+      s3Store: {
+        uploadPhoto: sinon.mock(),
+      },
+    },
+    body: new Buffer('foo'),
+    params: {
+      bucket: 'testBucket',
+      photoName: 'testPhoto.jpg',
+    },
   };
 });
 
 test.cb('should return upload details on success', (t) => {
+  const req = t.context.mockReq;
+
   const uploadRes = {
-    Bucket: 'testBucket',
-    key: 'testKey.jpg',
-    location: 'www.aws.s3/testBucket/testKey.jpg.com',
+    Bucket: req.params.bucket,
+    key: req.params.photoName,
+    location: `www.aws.s3/${req.params.bucket}/${req.params.photoName}.com`,
   };
 
-  // eslint-disable-next-line no-param-reassign
-  t.context.mockReq.params = { bucket: uploadRes.Bucket };
-
-  t.context.mockReq.pipe
+  t.context.mockReq.deps.s3Store.uploadPhoto
     .once()
-    .callsFake((busboy) => {
-      busboy.emit('file', null, 'testBody', uploadRes.key);
-    });
-
-  t.context.mockS3Store.uploadPhoto
-    .once()
-    .withArgs(uploadRes.Bucket, { Body: 'testBody', Key: uploadRes.key })
+    .withArgs(uploadRes.Bucket, { Body: t.context.mockReq.body, Key: uploadRes.key })
     .resolves(uploadRes);
 
   t.context.mockRes.status.never();
@@ -75,28 +69,24 @@ test.cb('should return upload details on success', (t) => {
       t.end();
     });
 
-  upload({ s3Store: t.context.mockS3Store })(t.context.mockReq, t.context.mockRes);
+  upload(req, t.context.mockRes);
 });
 
 test.cb('should surface s3 errors if thrown', (t) => {
+  const req = t.context.mockReq;
+
   const s3Error = {
     statusCode: 403,
     code: 'InvalidAccessKeyId',
     message: 'The AWS Access Key Id you provided does not exist in our records.',
   };
 
-  // eslint-disable-next-line no-param-reassign
-  t.context.mockReq.params = { bucket: 'testBucket' };
-
-  t.context.mockReq.pipe
+  t.context.mockReq.deps.s3Store.uploadPhoto
     .once()
-    .callsFake((busboy) => {
-      busboy.emit('file', null, 'testBody', 'testKey.jpg');
-    });
-
-  t.context.mockS3Store.uploadPhoto
-    .once()
-    .withArgs('testBucket', { Body: 'testBody', Key: 'testKey.jpg' })
+    .withArgs(req.params.bucket, {
+      Body: new Buffer(t.context.mockReq.body),
+      Key: req.params.photoName,
+    })
     .rejects(s3Error);
 
   t.context.mockRes.status
@@ -113,17 +103,13 @@ test.cb('should surface s3 errors if thrown', (t) => {
       t.end();
     });
 
-  upload({ s3Store: t.context.mockS3Store })(t.context.mockReq, t.context.mockRes);
+  upload(t.context.mockReq, t.context.mockRes);
 });
 
-test.cb('should return validation error if filename is invalid', (t) => {
-  t.context.mockS3Store.uploadPhoto.never();
-
-  t.context.mockReq.pipe
-    .once()
-    .callsFake((busboy) => {
-      busboy.emit('file', null, 'testBody', 'testKey');
-    });
+test.cb('should return validation error if buffer is invalid', (t) => {
+  // eslint-disable-next-line no-param-reassign
+  t.context.mockReq.body = null;
+  t.context.mockReq.deps.s3Store.uploadPhoto.never();
 
   t.context.mockRes.status
     .once()
@@ -133,28 +119,19 @@ test.cb('should return validation error if filename is invalid', (t) => {
   t.context.mockRes.json
     .once()
     .callsFake((response) => {
-      t.is(response.code, 'InvalidFileName');
-      t.is(response.message, 'Name of file is invalid. Must be jpg, png, or bmp');
+      t.is(response.code, 'BadRequest');
       verifyMocks(t);
       t.end();
     });
 
-  upload({ s3Store: t.context.mockS3Store })(t.context.mockReq, t.context.mockRes);
+  upload(t.context.mockReq, t.context.mockRes);
 });
 
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq.params = { bucket: 'testBucket' };
 
-  t.context.mockReq.pipe
-    .once()
-    .callsFake((busboy) => {
-      busboy.emit('file', null, 'testBody', 'testKey.jpg');
-    });
-
-  t.context.mockReq.pipe.atMost(1);
-
-  t.context.mockS3Store.uploadPhoto
+  t.context.mockReq.deps.s3Store.uploadPhoto
     .once()
     .rejects(new Error('foo'));
 
@@ -171,29 +148,5 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
       t.end();
     });
 
-  upload({ s3Store: t.context.mockS3Store })(t.context.mockReq, t.context.mockRes);
-});
-
-
-test.cb('should return 500 statusCode if unexpected thrown error', (t) => {
-  t.context.mockS3Store.uploadPhoto.never();
-
-  t.context.mockReq.pipe
-    .once()
-    .throws(new Error('oops'));
-
-  t.context.mockRes.status
-    .once()
-    .withArgs(500)
-    .returns(t.context.mockRes);
-
-  t.context.mockRes.json
-    .once()
-    .callsFake((response) => {
-      t.is(response.code, 'InternalServerError');
-      verifyMocks(t);
-      t.end();
-    });
-
-  upload({ s3Store: t.context.mockS3Store })(t.context.mockReq, t.context.mockRes);
+  upload(t.context.mockReq, t.context.mockRes);
 });

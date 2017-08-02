@@ -39,7 +39,13 @@ test.beforeEach((t) => {
 
 test.cb('should return list of urls', (t) => {
   const params = { bucket: 'testBucket' };
-  const req = { params, query: {} };
+  const req = {
+    params,
+    query: {},
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   const listRes = {
     IsTruncated: false,
@@ -80,12 +86,20 @@ test.cb('should return list of urls', (t) => {
       t.end();
     });
 
-  listUrls({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  listUrls(req, t.context.mockRes);
 });
 
 test.cb('should take an optional limit', (t) => {
   const params = { bucket: 'testBucket' };
-  const req = { params, query: { limit: 3 } };
+  const req = {
+    params,
+    query: {
+      limit: 3,
+    },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   const listRes = {
     IsTruncated: true,
@@ -129,12 +143,20 @@ test.cb('should take an optional limit', (t) => {
       t.end();
     });
 
-  listUrls({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  listUrls(req, t.context.mockRes);
 });
 
 test.cb('should accept an optional cursor', (t) => {
   const params = { bucket: 'testBucket' };
-  const req = { params, query: { cursor: 'asdf' } };
+  const req = {
+    params,
+    query: {
+      cursor: 'asdf',
+    },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   const listRes = {
     IsTruncated: false,
@@ -164,12 +186,18 @@ test.cb('should accept an optional cursor', (t) => {
       t.end();
     });
 
-  listUrls({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  listUrls(req, t.context.mockRes);
 });
 
 test.cb('should surface s3 errors if thrown', (t) => {
   const params = { bucket: 'testBucket' };
-  const req = { params, query: {} };
+  const req = {
+    params,
+    query: {},
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   const s3Error = {
     statusCode: 403,
@@ -198,12 +226,18 @@ test.cb('should surface s3 errors if thrown', (t) => {
       t.end();
     });
 
-  listUrls({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  listUrls(req, t.context.mockRes);
 });
 
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const params = { bucket: 'testBucket' };
-  const req = { params, query: {} };
+  const req = {
+    params,
+    query: {},
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   t.context.mockS3Store.listPhotos
     .once()
@@ -225,5 +259,5 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
       t.end();
     });
 
-  listUrls({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  listUrls(req, t.context.mockRes);
 });

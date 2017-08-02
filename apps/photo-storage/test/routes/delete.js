@@ -36,7 +36,12 @@ test.beforeEach((t) => {
 });
 
 test.cb('should return url if bucket and photo exists', (t) => {
-  const params = { bucket: 'testBucket', photo: 'testPhoto' };
+  const req = {
+    params: { bucket: 'testBucket', photo: 'testPhoto' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   t.context.mockS3Store.deletePhoto
     .once()
@@ -58,7 +63,7 @@ test.cb('should return url if bucket and photo exists', (t) => {
       t.end();
     });
 
-  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del(req, t.context.mockRes);
 });
 
 test.cb('should surface s3 errors if thrown', (t) => {
@@ -68,7 +73,12 @@ test.cb('should surface s3 errors if thrown', (t) => {
     message: 'The AWS Access Key Id you provided does not exist in our records.',
   };
 
-  const params = { bucket: 'testBucket', photo: 'testPhoto' };
+  const req = {
+    params: { bucket: 'testBucket', photo: 'testPhoto' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   t.context.mockS3Store.deletePhoto
     .once()
@@ -89,11 +99,16 @@ test.cb('should surface s3 errors if thrown', (t) => {
       t.end();
     });
 
-  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del(req, t.context.mockRes);
 });
 
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
-  const params = { bucket: 'testBucket', photo: 'testPhoto' };
+  const req = {
+    params: { bucket: 'testBucket', photo: 'testPhoto' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
+  };
 
   t.context.mockS3Store.deletePhoto
     .once()
@@ -113,5 +128,5 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
       t.end();
     });
 
-  del({ s3Store: t.context.mockS3Store })({ params }, t.context.mockRes);
+  del(req, t.context.mockRes);
 });
