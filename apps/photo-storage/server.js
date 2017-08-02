@@ -1,31 +1,31 @@
 const app = require('express')();
-const busboy = require('connect-busboy');
+const bodyParser = require('body-parser');
 const s3Store = require('./stores/s3')();
 
 const PORT = process.env.API_PORT || 3001;
-const DEPS = { s3Store };
 
-app.use(busboy());
+app.use(bodyParser.raw({ limit: '5mb', type: 'image/*' }));
+
+app.use((req, res, next) => {
+  req.deps = { s3Store };
+  next();
+});
 
 app.get('/', (req, res) => {
   res.send('welcome to the photo-storage api');
 });
 
-// Endpoint: Upload Photo (and create bucket if does not exist)
-app.post(
-  '/bucket/:bucket/photos',
-  require('./routes/assertBucket')(DEPS),
-  require('./routes/upload')(DEPS)
-);
+// Endpoint: Upload an image
+app.post('/bucket/:bucket/photos/:photoName', require('./routes/upload'));
 
-// Endpoint: List Photo URLs
-app.get('/bucket/:bucket/photos', require('./routes/listUrls')(DEPS));
+// Endpoint: List Photo urls
+app.get('/bucket/:bucket/photos', require('./routes/listUrls'));
 
 // Endpoint: Delete Photo
-app.delete('/bucket/:bucket/photos/:photo', require('./routes/delete')(DEPS));
+app.delete('/bucket/:bucket/photos/:photo', require('./routes/delete'));
 
 // Endpoint: Get Photo URL
-app.get('/bucket/:bucket/photos/:photo', require('./routes/getUrl')(DEPS));
+app.get('/bucket/:bucket/photos/:photo', require('./routes/getUrl'));
 
 // catch all if a path does not exist
 app.use((req, res) => {

@@ -11,39 +11,40 @@
   limitations under the License.
 */
 
-const isValidFilename = key => key.match(/\w.+(jpg|png|bmp)$/);
-const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
+module.exports = (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({
+      code: 'BadRequest',
+      message: 'Unable to parse request. Verify your content-type to be of image/*',
+    });
+  }
 
-module.exports = deps => (req, res) => {
-  try {
-    req.busboy.on('file', (_, Body, Key) => {
-      if (!isValidFilename(Key)) {
-        return res.status(400).json({
-          code: 'InvalidFileName',
-          message: 'Name of file is invalid. Must be jpg, png, or bmp',
+  const params = {
+    Body: req.body,
+    Key: req.params.photoName,
+  };
+
+  req.deps.s3Store.uploadPhoto(req.params.bucket, params)
+    .then((result) => {
+      res.json({
+        bucket: result.Bucket,
+        key: result.key,
+        location: result.Location,
+      });
+    })
+    .catch((e) => {
+      // surface errors from s3
+      if (e.statusCode && e.code) {
+        return res.status(e.statusCode).json({
+          code: e.code,
+          message: e.message,
         });
       }
 
-      deps.s3Store.uploadPhoto(req.params.bucket, { Body, Key })
-        .then((result) => {
-          res.json({
-            bucket: result.Bucket,
-            key: result.key,
-            location: result.Location,
-          });
-        })
-        .catch((e) => {
-          // surface errors from s3
-          if (e.statusCode && e.code && e.message) {
-            return res.status(e.statusCode).json({
-              code: e.code,
-              message: e.message,
-            });
-          }
-
-          sendServerError(res);
-        });
+      res.status(500).json({
+        code: 'InternalServerError',
+        name: e.name,
+        message: e.message,
+      });
     });
-    req.pipe(req.busboy);
-  } catch (e) { sendServerError(res); }
 };

@@ -13,8 +13,8 @@
 
 const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
 
-module.exports = deps => (req, res) => {
-  deps.s3Store.deletePhoto(req.params.bucket, req.params.photo)
+module.exports = (req, res) => {
+  req.deps.s3Store.deletePhoto(req.params.bucket, req.params.photo)
     .then(() => res.status(204).send())
     .catch((e) => {
       if (e.statusCode && e.code && e.message) {
