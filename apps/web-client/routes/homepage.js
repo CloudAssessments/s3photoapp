@@ -14,6 +14,12 @@
 module.exports = (req, res) => {
   const getPhotosUrl = `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`;
 
+  if (req.query && req.query.err) {
+    return res.render('index', {
+      err: req.query.err,
+    });
+  }
+
   req.deps.request.get(getPhotosUrl, (err, response, body) => {
     let bodyJson;
 

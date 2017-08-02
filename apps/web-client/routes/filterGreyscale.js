@@ -11,10 +11,8 @@
   limitations under the License.
 */
 
-module.exports = (req, res) => {
-  const bucket = req.deps.s3Bucket;
-  const photoName = res.locals.image.name;
-  const uploadUrl = `${req.deps.photoApiUrl}/bucket/${bucket}/photos/${photoName}`;
+module.exports = (req, res, next) => {
+  const greyscaleUrl = `${req.deps.filterApiUrl}/greyscale`;
 
   const redirect = err => (err ?
     res.redirect(`/?err=${err}`) :
@@ -23,11 +21,12 @@ module.exports = (req, res) => {
 
   const requestParams = {
     method: 'POST',
-    uri: uploadUrl,
-    body: res.locals.editedImage,
+    uri: greyscaleUrl,
+    body: res.locals.image.buffer,
     headers: {
       'content-type': res.locals.image.mimeType,
     },
+    encoding: null,
   };
 
   req.deps.request(requestParams, (err, result, body) => {
@@ -38,23 +37,23 @@ module.exports = (req, res) => {
       }));
     }
 
-    if (result.statusCode === 200) {
-      if (body) {
-        return redirect();
-      }
+    console.log('debugG2', body);
+    console.log('debugG3', result.statusCode);
 
-      return redirect(JSON.stringify({
-        code: 'UploadFailed',
-        message: 'Invalid response from photo-storage service',
-      }));
-    }
-
-    if (body) {
+    if (result.statusCode !== 200) {
       return redirect(JSON.stringify(body));
     }
 
-    redirect(JSON.stringify({
-      code: 'InternalServerError',
-    }));
+    try {
+      const buffer = new Buffer(body);
+      res.locals.editedImage = buffer;
+      next();
+    } catch (e) {
+      console.log('debugG1', e);
+      redirect(JSON.stringify({
+        code: 'FilterFailed',
+        message: 'Invalid response from photo-filter service',
+      }));
+    }
   });
 };
