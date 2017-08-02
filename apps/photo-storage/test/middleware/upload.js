@@ -14,7 +14,7 @@
 const { test } = require('ava');
 const EventEmitter = require('events');
 const sinon = require('sinon');
-const upload = require('../../middleware/upload.js');
+const upload = require('../../routes/upload.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();

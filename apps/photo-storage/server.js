@@ -14,18 +14,18 @@ app.get('/', (req, res) => {
 // Endpoint: Upload Photo (and create bucket if does not exist)
 app.post(
   '/bucket/:bucket/photos',
-  require('./middleware/assertBucket')(DEPS),
-  require('./middleware/upload')(DEPS)
+  require('./routes/assertBucket')(DEPS),
+  require('./routes/upload')(DEPS)
 );
 
 // Endpoint: List Photo URLs
-app.get('/bucket/:bucket/photos', require('./middleware/listUrls')(DEPS));
+app.get('/bucket/:bucket/photos', require('./routes/listUrls')(DEPS));
 
 // Endpoint: Delete Photo
-app.delete('/bucket/:bucket/photos/:photo', require('./middleware/delete')(DEPS));
+app.delete('/bucket/:bucket/photos/:photo', require('./routes/delete')(DEPS));
 
 // Endpoint: Get Photo URL
-app.get('/bucket/:bucket/photos/:photo', require('./middleware/getUrl')(DEPS));
+app.get('/bucket/:bucket/photos/:photo', require('./routes/getUrl')(DEPS));
 
 // catch all if a path does not exist
 app.use((req, res) => {

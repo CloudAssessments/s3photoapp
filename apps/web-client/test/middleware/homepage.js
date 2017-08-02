@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const homepage = require('../../middleware/homepage.js');
+const homepage = require('../../routes/homepage.js');
 
 const testBucket = 'testBucket';
 
@@ -86,8 +86,9 @@ test.cb('should render index with err if getPhotos does not return 200 status', 
 
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
+      const err = JSON.parse(ctx.err);
       t.is(viewFile, 'index');
-      t.is(ctx.err.code, 'NotFound');
+      t.is(err.code, 'NotFound');
       verifyMocks(t);
       t.end();
     });
@@ -167,9 +168,10 @@ test.cb('should render index with err if getPhotos response body is not json', (
 
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
+      const err = JSON.parse(ctx.err);
       t.is(viewFile, 'index');
-      t.is(ctx.err.code, 'ParseError');
-      t.is(ctx.err.message, 'Could not parse: { foo: bar }');
+      t.is(err.code, 'ParseError');
+      t.is(err.message, 'Could not parse: { foo: bar }');
       verifyMocks(t);
       t.end();
     });

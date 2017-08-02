@@ -12,9 +12,10 @@
 */
 
 const express = require('express');
+const logger = require('morgan');
 const path = require('path');
 const request = require('request');
-const logger = require('morgan');
+const url = require('url');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   req.deps = {
     request,
+    url,
     photoApiUrl: `http://localhost:${process.env.API_PORT}`,
     s3Bucket: process.env.S3_BUCKET,
   };
@@ -41,6 +43,8 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/', require('./middleware/homepage'));
+app.get('/', require('./routes/homepage'));
+
+app.post('/photo', require('./routes/upload'));
 
 module.exports = app;
