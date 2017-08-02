@@ -14,10 +14,7 @@
 module.exports = (req, res, next) => {
   const greyscaleUrl = `${req.deps.filterApiUrl}/greyscale`;
 
-  const redirect = err => (err ?
-    res.redirect(`/?err=${err}`) :
-    res.redirect('/')
-  );
+  const redirect = err => res.redirect(`/?err=${err}`);
 
   const requestParams = {
     method: 'POST',
@@ -29,7 +26,7 @@ module.exports = (req, res, next) => {
     encoding: null,
   };
 
-  req.deps.request(requestParams, (err, result, body) => {
+  req.deps.request(requestParams, (err, result, buffer) => {
     if (err) {
       return redirect(JSON.stringify({
         name: err.name,
@@ -37,23 +34,20 @@ module.exports = (req, res, next) => {
       }));
     }
 
-    console.log('debugG2', body);
-    console.log('debugG3', result.statusCode);
-
     if (result.statusCode !== 200) {
-      return redirect(JSON.stringify(body));
+      return buffer ?
+        redirect(JSON.stringify(buffer)) :
+        redirect(JSON.stringify({ code: 'InternalServerError' }));
     }
 
-    try {
-      const buffer = new Buffer(body);
+    if (buffer) {
       res.locals.editedImage = buffer;
-      next();
-    } catch (e) {
-      console.log('debugG1', e);
-      redirect(JSON.stringify({
-        code: 'FilterFailed',
-        message: 'Invalid response from photo-filter service',
-      }));
+      return next();
     }
+
+    redirect(JSON.stringify({
+      code: 'FilterFailed',
+      message: 'Invalid response from photo-filter service',
+    }));
   });
 };

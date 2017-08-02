@@ -13,10 +13,12 @@
 
 module.exports = (req, res, next) => {
   if (req.file && !req.file.mimetype.includes('image')) {
-    return res.status(400).json({
+    const err = JSON.stringify({
       code: 'InvalidMimeType',
       message: 'File must be a jpg, png, or bmp',
     });
+
+    return res.redirect(`/?err=${err}`);
   }
 
   res.locals.image = {

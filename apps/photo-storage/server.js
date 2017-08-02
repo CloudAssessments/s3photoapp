@@ -16,7 +16,11 @@ app.get('/', (req, res) => {
 });
 
 // Endpoint: Upload an image
-app.post('/bucket/:bucket/photos/:photoName', require('./routes/upload'));
+app.post(
+  '/bucket/:bucket/photos/:photoName',
+  require('./routes/assertBucket'),
+  require('./routes/upload')
+);
 
 // Endpoint: List Photo urls
 app.get('/bucket/:bucket/photos', require('./routes/listUrls'));
