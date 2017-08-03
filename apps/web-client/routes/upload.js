@@ -31,6 +31,14 @@ module.exports = (req, res) => {
   };
 
   req.deps.request(requestParams, (err, result, body) => {
+    if (err && err.code === 'ECONNREFUSED') {
+      const url = `${err.address}:${err.port}`;
+      return redirect(JSON.stringify({
+        code: err.code,
+        message: `Could not connect to photo-storage service at ${url}`,
+      }));
+    }
+
     if (err) {
       return redirect(JSON.stringify({
         name: err.name,

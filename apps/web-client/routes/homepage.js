@@ -28,6 +28,16 @@ module.exports = (req, res) => {
   req.deps.request.get(getPhotosUrl, (err, response, body) => {
     let bodyJson;
 
+    if (err && err.code === 'ECONNREFUSED') {
+      const url = `${err.address}:${err.port}`;
+      return renderHomepage({
+        err: JSON.stringify({
+          code: err.code,
+          message: `Could not connect to photo-storage service at ${url}`,
+        }),
+      });
+    }
+
     if (err) {
       return renderHomepage({ err });
     }

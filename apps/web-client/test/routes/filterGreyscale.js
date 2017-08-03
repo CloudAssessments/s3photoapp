@@ -164,3 +164,24 @@ test.cb('should redirect to homepage if request statusCode is not 200 and has no
   filterGreyscale(t.context.mockReq, t.context.mockRes);
 });
 
+// eslint-disable-next-line max-len
+test.cb('should redirect to homepage unable to connect to photo-filter service', (t) => {
+  t.context.mockReq.deps.request
+    .once()
+    .callsFake((params, cb) => {
+      t.is(params.method, 'POST');
+      t.is(params.body, t.context.mockRes.locals.image.buffer);
+      t.is(params.headers['content-type'], 'image/jpeg');
+      cb({ code: 'ECONNREFUSED', address: '127.0.0.1', port: '3002' });
+    });
+
+  t.context.mockRes.redirect
+    .callsFake((url) => {
+      // eslint-disable-next-line max-len
+      t.is(url, '/?err={"code":"ECONNREFUSED","message":"Could not connect to photo-filter service at 127.0.0.1:3002"}');
+      verifyMocks(t);
+      t.end();
+    });
+
+  filterGreyscale(t.context.mockReq, t.context.mockRes);
+});
