@@ -11,8 +11,6 @@
   limitations under the License.
 */
 
-const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
-
 module.exports = (req, res) => {
   req.deps.s3Store.listPhotos(req.params.bucket, req.query.limit, req.query.cursor)
     .then(result =>
@@ -35,6 +33,10 @@ module.exports = (req, res) => {
         });
       }
 
-      sendServerError(res);
+      res.status(500).json({
+        code: 'InternalServerError',
+        name: e.name,
+        message: e.message,
+      });
     });
 };
