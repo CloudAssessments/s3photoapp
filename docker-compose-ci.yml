@@ -1,0 +1,5 @@
+version: '3'
+services:
+  s3-photos:
+    build: .
+    image: s3-photos
