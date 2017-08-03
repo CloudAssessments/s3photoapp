@@ -19,7 +19,6 @@ const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
   t.context.mockS3Store.getPhotoUrl.verify();
-  t.context.mockS3Store.headObject.verify();
 };
 
 test.beforeEach((t) => {
@@ -33,7 +32,6 @@ test.beforeEach((t) => {
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
     getPhotoUrl: sinon.mock(),
-    headObject: sinon.mock(),
   };
 });
 
@@ -44,11 +42,6 @@ test.cb('should return url if bucket and photo exists', (t) => {
       s3Store: t.context.mockS3Store,
     },
   };
-
-  t.context.mockS3Store.headObject
-    .once()
-    .withArgs('testBucket', 'testPhoto')
-    .resolves({ ContentType: 'image/jpeg' });
 
   t.context.mockS3Store.getPhotoUrl
     .once()
@@ -83,11 +76,6 @@ test.cb('should surface s3 errors if thrown', (t) => {
     },
   };
 
-  t.context.mockS3Store.headObject
-    .once()
-    .withArgs('testBucket', 'testPhoto')
-    .resolves({ ContentType: 'image/jpeg' });
-
   t.context.mockS3Store.getPhotoUrl
     .once()
     .withArgs('testBucket', 'testPhoto')
@@ -117,11 +105,6 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
       s3Store: t.context.mockS3Store,
     },
   };
-
-  t.context.mockS3Store.headObject
-    .once()
-    .withArgs('testBucket', 'testPhoto')
-    .resolves({ ContentType: 'image/jpeg' });
 
   t.context.mockS3Store.getPhotoUrl
     .once()
