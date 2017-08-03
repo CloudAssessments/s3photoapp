@@ -2,11 +2,16 @@
   "name": "web-client",
   "version": "0.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CloudAssessments/s3photoapp.git"
+  },
   "scripts": {
     "clean": "rm -rf coverage .nyc_output node_modules",
-    "dev": "API_PORT=3001 FILTER_API_PORT=3002 STAGE=dev S3_BUCKET=testBucket nodemon ./bin/www",
+    "dev": "STORAGE_PORT=3001 FILTER_PORT=3002 S3_BUCKET=testBucket nodemon ./bin/www",
     "lint": "eslint",
-    "test": "STAGE=test nyc -r text -r html ava -T 300000"
+    "prod": "node ./bin/www",
+    "test": "nyc -r text -r html ava -T 300000"
   },
   "dependencies": {
     "debug": "~2.6.3",
