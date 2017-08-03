@@ -14,24 +14,29 @@
 module.exports = (req, res) => {
   const getPhotosUrl = `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`;
 
+  const renderHomepage = (ctx) => {
+    res.render('index', Object.assign(
+      { bucket: req.deps.s3Bucket },
+      ctx
+    ));
+  };
+
   if (req.query && req.query.err) {
-    return res.render('index', {
-      err: req.query.err,
-    });
+    return renderHomepage({ err: req.query.err });
   }
 
   req.deps.request.get(getPhotosUrl, (err, response, body) => {
     let bodyJson;
 
     if (err) {
-      return res.render('index', { err });
+      return renderHomepage({ err });
     }
 
     if (body) {
       try {
         bodyJson = JSON.parse(body);
       } catch (e) {
-        return res.render('index', {
+        return renderHomepage({
           err: JSON.stringify({
             code: 'ParseError',
             message: `Could not parse: ${body}`,
@@ -40,15 +45,16 @@ module.exports = (req, res) => {
       }
 
       if (response.statusCode === 200 && bodyJson && bodyJson.photos) {
-        return res.render('index', {
-          bucket: req.deps.s3Bucket,
-          urls: bodyJson.photos,
-        });
+        return renderHomepage({ urls: bodyJson.photos });
       }
 
-      return res.render('index', { err: body });
+      if (response.statusCode === 404) {
+        return renderHomepage({ urls: null });
+      }
+
+      return renderHomepage({ err: body });
     }
 
-    return res.render('index', { err: 'No response body' });
+    return renderHomepage({ err: 'No response body' });
   });
 };

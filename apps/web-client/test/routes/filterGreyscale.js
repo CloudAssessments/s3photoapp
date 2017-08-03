@@ -126,6 +126,7 @@ test.cb('should redirect to homepage if request statusCode is not 200 but has bo
       t.is(params.method, 'POST');
       t.is(params.body, t.context.mockRes.locals.image.buffer);
       t.is(params.headers['content-type'], 'image/jpeg');
+      // eslint-disable-next-line max-len
       cb(null, { statusCode: 500 }, new Buffer(JSON.stringify({ code: 'InternalServerError' })));
     });
 
