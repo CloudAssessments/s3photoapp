@@ -153,3 +153,25 @@ test.cb('should redirect to homepage if request statusCode is not 200 and has no
   upload(t.context.mockReq, t.context.mockRes);
 });
 
+// eslint-disable-next-line max-len
+test.cb('should redirect to homepage with error if cannot connect to photo-storage service', (t) => {
+  t.context.mockReq.deps.request
+    .once()
+    .callsFake((params, cb) => {
+      t.is(params.method, 'POST');
+      t.is(params.body, t.context.mockRes.locals.editedImage);
+      t.is(params.headers['content-type'], 'image/jpeg');
+      cb({ code: 'ECONNREFUSED', address: '127.0.0.1', port: '3001' });
+    });
+
+  t.context.mockRes.redirect
+    .callsFake((url) => {
+      // eslint-disable-next-line max-len
+      t.is(url, '/?err={"code":"ECONNREFUSED","message":"Could not connect to photo-storage service at 127.0.0.1:3001"}');
+      verifyMocks(t);
+      t.end();
+    });
+
+  upload(t.context.mockReq, t.context.mockRes);
+});
+
