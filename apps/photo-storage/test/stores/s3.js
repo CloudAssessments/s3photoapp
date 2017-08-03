@@ -25,6 +25,7 @@ test.beforeEach((t) => {
     createBucket: sinon.mock(),
     deleteObject: sinon.mock(),
     getSignedUrl: sinon.mock(),
+    headObject: sinon.mock(),
     listObjectsV2: sinon.mock(),
     upload: sinon.mock(),
   };
@@ -108,6 +109,31 @@ test('getUrl should if error occurs', (t) => {
     'oops'
   )
     .then(() => t.context.mockS3.getSignedUrl.verify());
+});
+
+test('headObject should resolve metadata if an object exists', (t) => {
+  const testParams = {
+    Bucket: generatedBucketName,
+    Key: testKey,
+  };
+
+  t.context.mockS3.headObject
+    .once()
+    .withArgs(testParams)
+    .returns({
+      promise: sinon.mock()
+        .resolves({
+          VersionId: 'null',
+          ContentType: 'image/jpeg',
+        }),
+    });
+
+  return s3StoreWithConn(t.context.mockS3).headObject(testBucket, testKey)
+    .then((res) => {
+      t.is(res.VersionId, 'null');
+      t.is(res.ContentType, 'image/jpeg');
+      t.context.mockS3.headObject.verify();
+    });
 });
 
 test('listPhotos should get a list of urls for photos in a bucket', (t) => {

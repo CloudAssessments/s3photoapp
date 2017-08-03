@@ -11,19 +11,18 @@
   limitations under the License.
 */
 
-const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
-
 module.exports = (req, res) => {
-  req.deps.s3Store.getPhotoUrl(req.params.bucket, req.params.photo)
+  req.deps.s3Store.headObject(req.params.bucket, req.params.photo)
+    .then(() => req.deps.s3Store.getPhotoUrl(req.params.bucket, req.params.photo))
     .then(url => res.send(url))
     .catch((e) => {
-      if (e.statusCode && e.code && e.message) {
+      if (e.statusCode && e.code) {
         return res.status(e.statusCode).json({
           code: e.code,
           message: e.message,
         });
       }
 
-      sendServerError(res);
+      res.status(500).json({ code: 'InternalServerError' });
     });
 };

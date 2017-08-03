@@ -68,6 +68,34 @@ test.cb('should render index with list of photo urls', (t) => {
   homepage(req, t.context.mockRes);
 });
 
+test.cb('should render index with no urls if bucket does not exist', (t) => {
+  const req = {
+    deps: {
+      photoApiUrl: 'http://localhost:test',
+      s3Bucket: testBucket,
+      request: t.context.mockRequest,
+    },
+  };
+
+  t.context.mockRequest.get
+    .once()
+    .callsFake((getPhotosUrl, cb) => {
+      t.is(getPhotosUrl, `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`);
+      cb(null, { statusCode: 404 }, JSON.stringify({ code: 'NoSuchBucket' }));
+    });
+
+  t.context.mockRes.render
+    .callsFake((viewFile, ctx) => {
+      t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
+      t.is(ctx.urls, null);
+      verifyMocks(t);
+      t.end();
+    });
+
+  homepage(req, t.context.mockRes);
+});
+
 test.cb('should render index with err if getPhotos does not return 200 status', (t) => {
   const req = {
     deps: {
@@ -81,14 +109,15 @@ test.cb('should render index with err if getPhotos does not return 200 status', 
     .once()
     .callsFake((getPhotosUrl, cb) => {
       t.is(getPhotosUrl, `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`);
-      cb(null, { statusCode: 404 }, JSON.stringify({ code: 'NotFound' }));
+      cb(null, { statusCode: 400 }, JSON.stringify({ code: 'BadRequest' }));
     });
 
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
       const err = JSON.parse(ctx.err);
       t.is(viewFile, 'index');
-      t.is(err.code, 'NotFound');
+      t.is(ctx.bucket, req.deps.s3Bucket);
+      t.is(err.code, 'BadRequest');
       verifyMocks(t);
       t.end();
     });
@@ -115,6 +144,7 @@ test.cb('should render index with err if getPhotos does not return a body', (t) 
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
       t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
       t.is(ctx.err, 'No response body');
       verifyMocks(t);
       t.end();
@@ -142,6 +172,7 @@ test.cb('should render index with err if error is returned by getPhotos', (t) =>
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
       t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
       t.is(ctx.err.message, 'oops');
       verifyMocks(t);
       t.end();
@@ -170,6 +201,7 @@ test.cb('should render index with err if getPhotos response body is not json', (
     .callsFake((viewFile, ctx) => {
       const err = JSON.parse(ctx.err);
       t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
       t.is(err.code, 'ParseError');
       t.is(err.message, 'Could not parse: { foo: bar }');
       verifyMocks(t);
@@ -195,6 +227,8 @@ test.cb('should render index with err if req query has err', (t) => {
 
   t.context.mockRes.render
     .callsFake((viewFile, ctx) => {
+      t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
       t.is(ctx.err, 'oops');
       verifyMocks(t);
       t.end();
