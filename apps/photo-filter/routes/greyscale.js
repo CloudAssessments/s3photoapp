@@ -19,32 +19,25 @@ module.exports = (req, res) => {
     });
   }
 
-  const params = {
-    Body: req.body,
-    Key: req.params.photoName,
-  };
-
-  req.deps.s3Store.uploadPhoto(req.params.bucket, params)
-    .then((result) => {
-      res.json({
-        bucket: result.Bucket,
-        key: result.key,
-        location: result.Location,
+  req.deps.jimp.read(req.body, (err, image) => {
+    if (err) {
+      return res.status(500).json({
+        code: 'InternalServerError',
+        name: err.name,
+        message: err.message,
       });
-    })
-    .catch((e) => {
-      // surface errors from s3
-      if (e.statusCode && e.code) {
-        return res.status(e.statusCode).json({
-          code: e.code,
-          message: e.message,
+    }
+
+    image.greyscale().getBuffer(req.deps.jimp.AUTO, (bufferErr, buffer) => {
+      if (bufferErr) {
+        return res.status(500).json({
+          code: 'InternalServerError',
+          name: bufferErr.name,
+          message: bufferErr.message,
         });
       }
 
-      res.status(500).json({
-        code: 'InternalServerError',
-        name: e.name,
-        message: e.message,
-      });
+      res.send(buffer);
     });
+  });
 };

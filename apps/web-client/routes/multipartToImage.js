@@ -11,19 +11,26 @@
   limitations under the License.
 */
 
-const sendServerError = res => res.status(500).json({ code: 'InternalServerError' });
+const validMimeTypes = ['image/bmp', 'image/jpeg', 'image/png'];
 
-module.exports = (req, res) => {
-  req.deps.s3Store.getPhotoUrl(req.params.bucket, req.params.photo)
-    .then(url => res.send(url))
-    .catch((e) => {
-      if (e.statusCode && e.code && e.message) {
-        return res.status(e.statusCode).json({
-          code: e.code,
-          message: e.message,
-        });
-      }
+const isValidImageMimeType = mimeType => validMimeTypes.includes(mimeType);
 
-      sendServerError(res);
+module.exports = (req, res, next) => {
+  if (req.file && !isValidImageMimeType(req.file.mimetype)) {
+    const err = JSON.stringify({
+      code: 'InvalidMimeType',
+      message: 'File must be a jpg, png, or bmp',
     });
+
+    return res.redirect(`/?err=${err}`);
+  }
+
+  res.locals.image = {
+    buffer: req.file.buffer,
+    encoding: req.file.encoding,
+    mimeType: req.file.mimetype,
+    name: req.file.originalname,
+  };
+
+  next();
 };

@@ -37,6 +37,9 @@ test.beforeEach((t) => {
 test.cb('should call next if bucket is successfully created', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
   };
 
   const next = () => {
@@ -52,12 +55,15 @@ test.cb('should call next if bucket is successfully created', (t) => {
   t.context.mockRes.status.never();
   t.context.mockRes.json.never();
 
-  assertBucket({ s3Store: t.context.mockS3Store })(req, t.context.mockRes, next);
+  assertBucket(req, t.context.mockRes, next);
 });
 
 test.cb('should return S3 errors if they exist', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
   };
 
   const s3Error = {
@@ -84,12 +90,15 @@ test.cb('should return S3 errors if they exist', (t) => {
       t.end();
     });
 
-  assertBucket({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  assertBucket(req, t.context.mockRes);
 });
 
 test.cb('should return 500 statusCode if unexpected error thrown', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
+    deps: {
+      s3Store: t.context.mockS3Store,
+    },
   };
 
   t.context.mockS3Store.assertBucket
@@ -110,5 +119,5 @@ test.cb('should return 500 statusCode if unexpected error thrown', (t) => {
       t.end();
     });
 
-  assertBucket({ s3Store: t.context.mockS3Store })(req, t.context.mockRes);
+  assertBucket(req, t.context.mockRes);
 });

@@ -13,11 +13,10 @@
 
 const express = require('express');
 const logger = require('morgan');
+const multer = require('multer')();
 const path = require('path');
 const request = require('request');
 const url = require('url');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 
 const app = express();
 
@@ -26,9 +25,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // inject dependencies into req object
@@ -36,15 +32,23 @@ app.use((req, res, next) => {
   req.deps = {
     request,
     url,
+    filterApiUrl: `http://localhost:${process.env.FILTER_API_PORT}`,
     photoApiUrl: `http://localhost:${process.env.API_PORT}`,
     s3Bucket: process.env.S3_BUCKET,
   };
   next();
 });
 
-// Routes
+// Routes: Homepage
 app.get('/', require('./routes/homepage'));
 
-app.post('/photo', require('./routes/upload'));
+// Routes: Upload Image
+app.post(
+  '/photo',
+  multer.single('uploadedImage'),
+  require('./routes/multipartToImage'),
+  require('./routes/filterGreyscale'),
+  require('./routes/upload')
+);
 
 module.exports = app;

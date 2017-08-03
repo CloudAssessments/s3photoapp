@@ -11,8 +11,8 @@
   limitations under the License.
 */
 
-module.exports = deps => (req, res, next) => {
-  deps.s3Store.assertBucket(req.params.bucket)
+module.exports = (req, res, next) => {
+  req.deps.s3Store.assertBucket(req.params.bucket)
     .then(() => next())
     .catch((e) => {
       if (e.statusCode && e.code && e.message) {
