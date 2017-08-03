@@ -9,12 +9,11 @@ services:
     ports:
       - '3000:3000'
     environment:
-      API_PORT: '3001'
-      S3_BUCKET: prodBucket # specify which S3 Bucket to use
       FILTER_HOST: photo-filter
       FILTER_PORT: '3002'
       STORAGE_HOST: photo-storage
       STORAGE_PORT: '3001'
+      S3_BUCKET:
 
   photo-filter:
     build:
@@ -36,8 +35,8 @@ services:
     ports:
       - '3001:3001'
     environment:
-      STAGE: prod
       PORT: '3001'
+      STAGE: prod
       AWS_DEFAULT_REGION:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:

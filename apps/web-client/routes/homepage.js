@@ -21,6 +21,15 @@ module.exports = (req, res) => {
     ));
   };
 
+  if (!req.deps.s3Bucket) {
+    return renderHomepage({
+      err: JSON.stringify({
+        code: 'ConfigurationError',
+        message: 'Environment variable: S3_BUCKET not specified',
+      }),
+    });
+  }
+
   if (req.query && req.query.err) {
     return renderHomepage({ err: req.query.err });
   }
