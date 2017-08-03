@@ -20,6 +20,9 @@ const url = require('url');
 
 const app = express();
 
+const filterHost = process.env.FILTER_HOST || 'localhost';
+const storageHost = process.env.STORAGE_HOST || 'localhost';
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -32,8 +35,8 @@ app.use((req, res, next) => {
   req.deps = {
     request,
     url,
-    filterApiUrl: `http://localhost:${process.env.FILTER_API_PORT}`,
-    photoApiUrl: `http://localhost:${process.env.API_PORT}`,
+    filterApiUrl: `http://${filterHost}:${process.env.FILTER_PORT}`,
+    photoApiUrl: `http://${storageHost}:${process.env.STORAGE_PORT}`,
     s3Bucket: process.env.S3_BUCKET,
   };
   next();
