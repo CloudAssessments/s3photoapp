@@ -37,9 +37,6 @@ This project is composed of independent Node.js services:
 ### Environment Variable Reference
 
 **web-client:**
-- `S3_BUCKET`:
-  - Default: none
-  - Description: A string that will be used in naming the Amazon S3 Bucket.
 - `FILTER_HOST`:
   - Default: "localhost"
   - Description: The host name of the url that the `photo-filter` service is listening on.

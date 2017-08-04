@@ -13,7 +13,6 @@ services:
       FILTER_PORT: '3002'
       STORAGE_HOST: photo-storage
       STORAGE_PORT: '3001'
-      S3_BUCKET:
 
   photo-filter:
     build:

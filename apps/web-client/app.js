@@ -17,8 +17,10 @@ const multer = require('multer')();
 const path = require('path');
 const request = require('request');
 const url = require('url');
+const { v4: uuid } = require('uuid');
 
 const app = express();
+const s3Bucket = uuid();
 
 const filterHost = process.env.FILTER_HOST || 'localhost';
 const storageHost = process.env.STORAGE_HOST || 'localhost';
@@ -34,10 +36,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   req.deps = {
     request,
+    s3Bucket,
     url,
     filterApiUrl: `http://${filterHost}:${process.env.FILTER_PORT}`,
     photoApiUrl: `http://${storageHost}:${process.env.STORAGE_PORT}`,
-    s3Bucket: process.env.S3_BUCKET,
   };
   next();
 });
