@@ -35,6 +35,11 @@ const getPhotoUrl = s3 => (bucketName, key) => new Promise((resolve, reject) => 
   });
 });
 
+const headObject = s3 => (bucketName, key) => {
+  const params = { Bucket: generateBucketName(bucketName), Key: key };
+  return s3.headObject(params).promise();
+};
+
 const listPhotos = s3 => (bucketName, limit, cursor) => {
   const params = Object.assign(
     { Bucket: generateBucketName(bucketName) },
@@ -68,6 +73,7 @@ module.exports = function s3Store(s3Conn) {
     deletePhoto: deletePhoto(s3),
     getPhotoUrl: getPhotoUrl(s3),
     listPhotos: listPhotos(s3),
+    headObject: headObject(s3),
     uploadPhoto: uploadPhoto(s3),
   };
 };
