@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const filterGreyscale = require('../../routes/filterGreyscale.js');
+const filterGreyscale = require('../../middleware/filterGreyscale.js');
 
 const testBucket = 'testBucket';
 

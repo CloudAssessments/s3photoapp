@@ -42,18 +42,18 @@ app.get('/', (req, res) => {
 // Endpoint: Upload an image
 app.post(
   '/bucket/:bucket/photos/:photoName',
-  require('./routes/assertBucket'),
-  require('./routes/upload')
+  require('./middleware/assertBucket'),
+  require('./middleware/upload')
 );
 
 // Endpoint: List Photo urls
-app.get('/bucket/:bucket/photos', require('./routes/listUrls'));
+app.get('/bucket/:bucket/photos', require('./middleware/listUrls'));
 
 // Endpoint: Delete Photo
-app.delete('/bucket/:bucket/photos/:photo', require('./routes/delete'));
+app.delete('/bucket/:bucket/photos/:photo', require('./middleware/delete'));
 
 // Endpoint: Get Photo URL
-app.get('/bucket/:bucket/photos/:photo', require('./routes/getUrl'));
+app.get('/bucket/:bucket/photos/:photo', require('./middleware/getUrl'));
 
 // catch all if a path does not exist
 app.use((req, res) => {

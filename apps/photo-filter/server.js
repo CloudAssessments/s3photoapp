@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 });
 
 // Endpoint: Apply greyscale filter to an image
-app.post('/greyscale', require('./routes/greyscale'));
+app.post('/greyscale', require('./middleware/greyscale'));
 
 // catch all if a path does not exist
 app.use((req, res) => {
