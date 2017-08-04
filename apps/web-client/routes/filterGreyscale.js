@@ -12,7 +12,7 @@
 */
 
 module.exports = (req, res, next) => {
-  const greyscaleUrl = `${req.deps.filterApiUrl}/greyscale`;
+  const greyscaleUrl = `${req.app.locals.filterApiUrl}/greyscale`;
 
   const redirect = err => res.redirect(`/?err=${err}`);
 
@@ -26,7 +26,7 @@ module.exports = (req, res, next) => {
     encoding: null,
   };
 
-  req.deps.request(requestParams, (err, result, buffer) => {
+  req.app.locals.request(requestParams, (err, result, buffer) => {
     if (err && err.code === 'ECONNREFUSED') {
       const url = `${err.address}:${err.port}`;
       return redirect(JSON.stringify({

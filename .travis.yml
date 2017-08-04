@@ -16,5 +16,9 @@ before_install:
 install:
   - docker-compose build
 script:
-  - docker-compose run s3-photos make lint
-  - docker-compose run s3-photos make test
+  - docker-compose run web-client npm run lint .
+  - docker-compose run web-client npm run test
+  - docker-compose run photo-filter npm run lint .
+  - docker-compose run photo-filter npm run test
+  - docker-compose run photo-storage npm run lint .
+  - docker-compose run photo-storage npm run test

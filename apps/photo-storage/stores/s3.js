@@ -63,7 +63,10 @@ const uploadPhoto = s3 => (bucketName, data) => {
 
 module.exports = function s3Store(s3Conn) {
   /* istanbul ignore next */
-  const s3 = s3Conn || new AWS.S3();
+  const s3 = s3Conn || new AWS.S3({
+    apiVersion: '2006-03-01',
+    region: process.env.AWS_REGION || 'us-east-1',
+  });
 
   return {
     assertBucket: assertBucket(s3),

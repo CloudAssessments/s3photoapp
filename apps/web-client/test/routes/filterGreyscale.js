@@ -19,7 +19,7 @@ const testBucket = 'testBucket';
 
 const verifyMocks = (t) => {
   t.context.mockRes.redirect.verify();
-  t.context.mockReq.deps.request.verify();
+  t.context.mockReq.app.locals.request.verify();
 };
 
 test.beforeEach((t) => {
@@ -37,10 +37,12 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq = {
-    deps: {
-      photoApiUrl: 'http://localhost:test',
-      s3Bucket: testBucket,
-      request: sinon.mock(),
+    app: {
+      locals: {
+        photoApiUrl: 'http://localhost:test',
+        s3Bucket: testBucket,
+        request: sinon.mock(),
+      },
     },
   };
 
@@ -49,7 +51,7 @@ test.beforeEach((t) => {
 });
 
 test.cb('should redirect to homepage with filterGreyscale response', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -72,7 +74,7 @@ test.cb('should redirect to homepage with filterGreyscale response', (t) => {
 });
 
 test.cb('should redirect to homepage if filterGreyscale responds with no data', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -96,7 +98,7 @@ test.cb('should redirect to homepage if filterGreyscale responds with no data', 
 });
 
 test.cb('should redirect to homepage with request error', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -120,7 +122,7 @@ test.cb('should redirect to homepage with request error', (t) => {
 
 // eslint-disable-next-line max-len
 test.cb('should redirect to homepage if request statusCode is not 200 but has body', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -145,7 +147,7 @@ test.cb('should redirect to homepage if request statusCode is not 200 but has bo
 
 // eslint-disable-next-line max-len
 test.cb('should redirect to homepage if request statusCode is not 200 and has no body', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -166,7 +168,7 @@ test.cb('should redirect to homepage if request statusCode is not 200 and has no
 
 // eslint-disable-next-line max-len
 test.cb('should redirect to homepage unable to connect to photo-filter service', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
