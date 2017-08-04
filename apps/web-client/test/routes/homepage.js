@@ -236,3 +236,32 @@ test.cb('should render index with err if req query has err', (t) => {
 
   homepage(req, t.context.mockRes);
 });
+
+test.cb('should render index with err cannot connect to photo-storage service', (t) => {
+  const req = {
+    deps: {
+      photoApiUrl: 'http://localhost:test',
+      s3Bucket: testBucket,
+      request: t.context.mockRequest,
+    },
+  };
+
+  t.context.mockRequest.get
+    .once()
+    .callsFake((url, cb) => {
+      t.is(url, 'http://localhost:test/bucket/testBucket/photos');
+      cb({ code: 'ECONNREFUSED', address: '127.0.0.1', port: '3001' });
+    });
+
+  t.context.mockRes.render
+    .callsFake((viewFile, ctx) => {
+      t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
+      // eslint-disable-next-line max-len
+      t.is(ctx.err, '{"code":"ECONNREFUSED","message":"Could not connect to photo-storage service at 127.0.0.1:3001"}');
+      verifyMocks(t);
+      t.end();
+    });
+
+  homepage(req, t.context.mockRes);
+});
