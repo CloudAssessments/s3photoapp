@@ -12,29 +12,21 @@
 */
 
 module.exports = (req, res) => {
-  const getPhotosUrl = `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`;
+  // eslint-disable-next-line max-len
+  const getPhotosUrl = `${req.app.locals.photoApiUrl}/bucket/${req.app.locals.s3Bucket}/photos`;
 
   const renderHomepage = (ctx) => {
     res.render('index', Object.assign(
-      { bucket: req.deps.s3Bucket },
+      { bucket: req.app.locals.s3Bucket },
       ctx
     ));
   };
-
-  if (!req.deps.s3Bucket) {
-    return renderHomepage({
-      err: JSON.stringify({
-        code: 'ConfigurationError',
-        message: 'Environment variable: S3_BUCKET not specified',
-      }),
-    });
-  }
 
   if (req.query && req.query.err) {
     return renderHomepage({ err: req.query.err });
   }
 
-  req.deps.request.get(getPhotosUrl, (err, response, body) => {
+  req.app.locals.request.get(getPhotosUrl, (err, response, body) => {
     let bodyJson;
 
     if (err && err.code === 'ECONNREFUSED') {
