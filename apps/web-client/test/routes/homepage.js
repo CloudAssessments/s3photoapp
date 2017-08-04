@@ -265,3 +265,26 @@ test.cb('should render index with err cannot connect to photo-storage service', 
 
   homepage(req, t.context.mockRes);
 });
+
+test.cb('should render index with err if s3Bucket not set', (t) => {
+  const req = {
+    deps: {
+      photoApiUrl: 'http://localhost:test',
+      request: t.context.mockRequest,
+    },
+  };
+
+  t.context.mockRequest.get.never();
+
+  t.context.mockRes.render
+    .callsFake((viewFile, ctx) => {
+      t.is(viewFile, 'index');
+      t.is(ctx.bucket, req.deps.s3Bucket);
+      // eslint-disable-next-line max-len
+      t.is(ctx.err, '{"code":"ConfigurationError","message":"Environment variable: S3_BUCKET not specified"}');
+      verifyMocks(t);
+      t.end();
+    });
+
+  homepage(req, t.context.mockRes);
+});
