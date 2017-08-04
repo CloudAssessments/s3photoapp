@@ -35,11 +35,6 @@ const getPhotoUrl = s3 => (bucketName, key) => new Promise((resolve, reject) => 
   });
 });
 
-const headObject = s3 => (bucketName, key) => {
-  const params = { Bucket: generateBucketName(bucketName), Key: key };
-  return s3.headObject(params).promise();
-};
-
 const listPhotos = s3 => (bucketName, limit, cursor) => {
   const params = Object.assign(
     { Bucket: generateBucketName(bucketName) },
@@ -63,14 +58,16 @@ const uploadPhoto = s3 => (bucketName, data) => {
 
 module.exports = function s3Store(s3Conn) {
   /* istanbul ignore next */
-  const s3 = s3Conn || new AWS.S3();
+  const s3 = s3Conn || new AWS.S3({
+    apiVersion: '2006-03-01',
+    region: process.env.AWS_REGION || 'us-east-1',
+  });
 
   return {
     assertBucket: assertBucket(s3),
     deletePhoto: deletePhoto(s3),
     getPhotoUrl: getPhotoUrl(s3),
     listPhotos: listPhotos(s3),
-    headObject: headObject(s3),
     uploadPhoto: uploadPhoto(s3),
   };
 };

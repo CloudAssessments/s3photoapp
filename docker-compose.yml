@@ -1,5 +1,17 @@
 version: '3'
 services:
-  s3-photos:
-    build: .
-    image: s3-photos
+  web-client:
+    build:
+      context: ./apps/web-client
+      dockerfile: Dockerfile
+    image: s3-photos/web-client:prod
+  photo-filter:
+    build:
+      context: ./apps/photo-filter
+      dockerfile: Dockerfile
+    image: s3-photos/photo-filter:prod
+  photo-storage:
+    build:
+      context: ./apps/photo-storage
+      dockerfile: Dockerfile
+    image: s3-photos/photo-storage:prod

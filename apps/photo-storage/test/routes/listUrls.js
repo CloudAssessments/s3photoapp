@@ -255,6 +255,8 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
     .once()
     .callsFake((response) => {
       t.is(response.code, 'InternalServerError');
+      t.is(response.name, 'Error');
+      t.is(response.message, 'oops');
       verifyMocks(t);
       t.end();
     });

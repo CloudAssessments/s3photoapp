@@ -11,14 +11,19 @@
   limitations under the License.
 */
 
+const { DynamoDB } = require('aws-sdk');
 const express = require('express');
 const logger = require('morgan');
 const multer = require('multer')();
 const path = require('path');
 const request = require('request');
-const url = require('url');
+const { v4: uuid } = require('uuid');
 
 const app = express();
+const dynamodb = new DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
+
+const filterHost = process.env.FILTER_HOST || 'localhost';
+const storageHost = process.env.STORAGE_HOST || 'localhost';
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,17 +32,18 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// inject dependencies into req object
-app.use((req, res, next) => {
-  req.deps = {
-    request,
-    url,
-    filterApiUrl: `http://localhost:${process.env.FILTER_API_PORT}`,
-    photoApiUrl: `http://localhost:${process.env.API_PORT}`,
-    s3Bucket: process.env.S3_BUCKET,
-  };
-  next();
-});
+// inject dependencies into app.locals
+app.locals = {
+  request,
+  uuid,
+  dynamodb,
+  filterApiUrl: `http://${filterHost}:${process.env.FILTER_PORT}`,
+  photoApiUrl: `http://${storageHost}:${process.env.STORAGE_PORT}`,
+  table: 's3-photos-bucket-id',
+};
+
+// Get Or Create the S3 Bucket Id
+app.use(require('./middleware/getOrCreateS3BucketId'));
 
 // Routes: Homepage
 app.get('/', require('./routes/homepage'));

@@ -12,9 +12,9 @@
 */
 
 module.exports = (req, res) => {
-  const bucket = req.deps.s3Bucket;
+  const bucket = req.app.locals.s3Bucket;
   const photoName = res.locals.image.name;
-  const uploadUrl = `${req.deps.photoApiUrl}/bucket/${bucket}/photos/${photoName}`;
+  const uploadUrl = `${req.app.locals.photoApiUrl}/bucket/${bucket}/photos/${photoName}`;
 
   const redirect = err => (err ?
     res.redirect(`/?err=${err}`) :
@@ -30,7 +30,15 @@ module.exports = (req, res) => {
     },
   };
 
-  req.deps.request(requestParams, (err, result, body) => {
+  req.app.locals.request(requestParams, (err, result, body) => {
+    if (err && err.code === 'ECONNREFUSED') {
+      const url = `${err.address}:${err.port}`;
+      return redirect(JSON.stringify({
+        code: err.code,
+        message: `Could not connect to photo-storage service at ${url}`,
+      }));
+    }
+
     if (err) {
       return redirect(JSON.stringify({
         name: err.name,

@@ -19,7 +19,7 @@ const testBucket = 'testBucket';
 
 const verifyMocks = (t) => {
   t.context.mockRes.redirect.verify();
-  t.context.mockReq.deps.request.verify();
+  t.context.mockReq.app.locals.request.verify();
 };
 
 test.beforeEach((t) => {
@@ -37,10 +37,12 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq = {
-    deps: {
-      photoApiUrl: 'http://localhost:test',
-      s3Bucket: testBucket,
-      request: sinon.mock(),
+    app: {
+      locals: {
+        photoApiUrl: 'http://localhost:test',
+        s3Bucket: testBucket,
+        request: sinon.mock(),
+      },
     },
   };
 });
@@ -51,7 +53,7 @@ test.cb('should redirect to homepage with upload response', (t) => {
     key: t.context.mockRes.locals.image.name,
   };
 
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -71,7 +73,7 @@ test.cb('should redirect to homepage with upload response', (t) => {
 });
 
 test.cb('should redirect to homepage if upload responds with no data', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -92,7 +94,7 @@ test.cb('should redirect to homepage if upload responds with no data', (t) => {
 });
 
 test.cb('should redirect to homepage with request error', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -113,7 +115,7 @@ test.cb('should redirect to homepage with request error', (t) => {
 
 // eslint-disable-next-line max-len
 test.cb('should redirect to homepage if request statusCode is not 200 but has body', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -134,7 +136,7 @@ test.cb('should redirect to homepage if request statusCode is not 200 but has bo
 
 // eslint-disable-next-line max-len
 test.cb('should redirect to homepage if request statusCode is not 200 and has no body', (t) => {
-  t.context.mockReq.deps.request
+  t.context.mockReq.app.locals.request
     .once()
     .callsFake((params, cb) => {
       t.is(params.method, 'POST');
@@ -146,6 +148,28 @@ test.cb('should redirect to homepage if request statusCode is not 200 and has no
   t.context.mockRes.redirect
     .callsFake((url) => {
       t.is(url, '/?err={"code":"InternalServerError"}');
+      verifyMocks(t);
+      t.end();
+    });
+
+  upload(t.context.mockReq, t.context.mockRes);
+});
+
+// eslint-disable-next-line max-len
+test.cb('should redirect to homepage with error if cannot connect to photo-storage service', (t) => {
+  t.context.mockReq.app.locals.request
+    .once()
+    .callsFake((params, cb) => {
+      t.is(params.method, 'POST');
+      t.is(params.body, t.context.mockRes.locals.editedImage);
+      t.is(params.headers['content-type'], 'image/jpeg');
+      cb({ code: 'ECONNREFUSED', address: '127.0.0.1', port: '3001' });
+    });
+
+  t.context.mockRes.redirect
+    .callsFake((url) => {
+      // eslint-disable-next-line max-len
+      t.is(url, '/?err={"code":"ECONNREFUSED","message":"Could not connect to photo-storage service at 127.0.0.1:3001"}');
       verifyMocks(t);
       t.end();
     });

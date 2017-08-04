@@ -12,11 +12,12 @@
 */
 
 module.exports = (req, res) => {
-  const getPhotosUrl = `${req.deps.photoApiUrl}/bucket/${req.deps.s3Bucket}/photos`;
+  // eslint-disable-next-line max-len
+  const getPhotosUrl = `${req.app.locals.photoApiUrl}/bucket/${req.app.locals.s3Bucket}/photos`;
 
   const renderHomepage = (ctx) => {
     res.render('index', Object.assign(
-      { bucket: req.deps.s3Bucket },
+      { bucket: req.app.locals.s3Bucket },
       ctx
     ));
   };
@@ -25,8 +26,18 @@ module.exports = (req, res) => {
     return renderHomepage({ err: req.query.err });
   }
 
-  req.deps.request.get(getPhotosUrl, (err, response, body) => {
+  req.app.locals.request.get(getPhotosUrl, (err, response, body) => {
     let bodyJson;
+
+    if (err && err.code === 'ECONNREFUSED') {
+      const url = `${err.address}:${err.port}`;
+      return renderHomepage({
+        err: JSON.stringify({
+          code: err.code,
+          message: `Could not connect to photo-storage service at ${url}`,
+        }),
+      });
+    }
 
     if (err) {
       return renderHomepage({ err });
