@@ -38,8 +38,10 @@ test.beforeEach((t) => {
 test.cb('should return url if bucket and photo exists', (t) => {
   const req = {
     params: { bucket: 'testBucket', photo: 'testPhoto' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -75,8 +77,10 @@ test.cb('should surface s3 errors if thrown', (t) => {
 
   const req = {
     params: { bucket: 'testBucket', photo: 'testPhoto' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -105,8 +109,10 @@ test.cb('should surface s3 errors if thrown', (t) => {
 test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const req = {
     params: { bucket: 'testBucket', photo: 'testPhoto' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 

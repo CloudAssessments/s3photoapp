@@ -42,8 +42,10 @@ test.cb('should return list of urls', (t) => {
   const req = {
     params,
     query: {},
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -96,8 +98,10 @@ test.cb('should take an optional limit', (t) => {
     query: {
       limit: 3,
     },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -153,8 +157,10 @@ test.cb('should accept an optional cursor', (t) => {
     query: {
       cursor: 'asdf',
     },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -194,8 +200,10 @@ test.cb('should surface s3 errors if thrown', (t) => {
   const req = {
     params,
     query: {},
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -234,8 +242,10 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   const req = {
     params,
     query: {},
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 

@@ -12,8 +12,8 @@
 */
 
 module.exports = (req, res) => {
-  req.deps.s3Store.headObject(req.params.bucket, req.params.photo)
-    .then(() => req.deps.s3Store.getPhotoUrl(req.params.bucket, req.params.photo))
+  req.app.locals.s3Store.headObject(req.params.bucket, req.params.photo)
+    .then(() => req.app.locals.s3Store.getPhotoUrl(req.params.bucket, req.params.photo))
     .then(url => res.send(url))
     .catch((e) => {
       if (e.statusCode && e.code) {
