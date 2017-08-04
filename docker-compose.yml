@@ -5,37 +5,13 @@ services:
       context: ./apps/web-client
       dockerfile: Dockerfile
     image: s3-photos/web-client:prod
-    command: npm run prod
-    ports:
-      - '3000:3000'
-    environment:
-      FILTER_HOST: photo-filter
-      FILTER_PORT: '3002'
-      STORAGE_HOST: photo-storage
-      STORAGE_PORT: '3001'
-
   photo-filter:
     build:
       context: ./apps/photo-filter
       dockerfile: Dockerfile
     image: s3-photos/photo-filter:prod
-    command: npm run prod
-    ports:
-      - '3002:3002'
-    environment:
-      PORT: '3002'
-
   photo-storage:
     build:
       context: ./apps/photo-storage
       dockerfile: Dockerfile
     image: s3-photos/photo-storage:prod
-    command: npm run prod
-    ports:
-      - '3001:3001'
-    environment:
-      PORT: '3001'
-      STAGE: prod
-      AWS_DEFAULT_REGION:
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:

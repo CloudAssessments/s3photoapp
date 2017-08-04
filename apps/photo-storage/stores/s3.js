@@ -60,9 +60,7 @@ module.exports = function s3Store(s3Conn) {
   /* istanbul ignore next */
   const s3 = s3Conn || new AWS.S3({
     apiVersion: '2006-03-01',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_DEFAULT_REGION,
+    region: process.env.AWS_REGION || 'us-east-1',
   });
 
   return {

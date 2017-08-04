@@ -47,6 +47,7 @@ test('should create dynamodb table if it does not exist', (t) => {
   return assertDynamoTable(t.context.dynamodb, 'testTable')
     .then((result) => {
       t.is(result.TableName, 'testTable');
+      verifyMocks(t);
     });
 });
 
@@ -76,5 +77,6 @@ test('should return dynamodb table description if it already exists', (t) => {
   return assertDynamoTable(t.context.dynamodb, 'testTable')
     .then((result) => {
       t.is(result.TableName, 'testTable');
+      verifyMocks(t);
     });
 });
