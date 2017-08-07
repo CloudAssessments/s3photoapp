@@ -11,8 +11,12 @@
   limitations under the License.
 */
 
+const debugAppVars = require('debug')('APP_VARS');
+
 module.exports = (req, res, next) => {
   const greyscaleUrl = `${req.app.locals.filterApiUrl}/greyscale`;
+
+  debugAppVars('GREYSCALE_URL: ', greyscaleUrl);
 
   const redirect = err => res.redirect(`/?err=${err}`);
 

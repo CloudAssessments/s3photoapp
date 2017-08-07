@@ -11,9 +11,16 @@
   limitations under the License.
 */
 
+const debug = require('debug');
+
+const debugAppVars = debug('APP_VARS');
+const debugError = debug('ERRORS');
+
 module.exports = (req, res) => {
   // eslint-disable-next-line max-len
   const getPhotosUrl = `${req.app.locals.photoApiUrl}/bucket/${req.app.locals.s3Bucket}/photos`;
+
+  debugAppVars('GET_PHOTOS_URL: ', getPhotosUrl);
 
   const renderHomepage = (ctx) => {
     res.render('index', Object.assign(
@@ -40,6 +47,7 @@ module.exports = (req, res) => {
     }
 
     if (err) {
+      debugError('GET PHOTOS REQUEST: ', err);
       return renderHomepage({ err });
     }
 
@@ -47,6 +55,7 @@ module.exports = (req, res) => {
       try {
         bodyJson = JSON.parse(body);
       } catch (e) {
+        debugError('GET PHOTOS REQUEST BODY PARSING: ', e);
         return renderHomepage({
           err: JSON.stringify({
             code: 'ParseError',

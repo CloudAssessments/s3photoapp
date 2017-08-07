@@ -12,6 +12,7 @@
 */
 
 const { DynamoDB } = require('aws-sdk');
+const debug = require('debug');
 const express = require('express');
 const logger = require('morgan');
 const multer = require('multer')();
@@ -20,12 +21,22 @@ const request = require('request');
 const { v4: uuid } = require('uuid');
 
 const app = express();
+const debugAppVars = debug('APP_VARS');
 const dynamodb = new DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
+
+debugAppVars('PROCESS.ENV: ', process.env);
 
 const filterHost = process.env.FILTER_HOST || 'localhost';
 const filterPort = process.env.FILTER_PORT || '3002';
 const storageHost = process.env.STORAGE_HOST || 'localhost';
 const storagePort = process.env.STORAGE_PORT || '3001';
+
+debugAppVars('EXTERNAL HOSTS/PORTS: ', {
+  filterHost,
+  filterPort,
+  storageHost,
+  storagePort,
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,6 +55,11 @@ app.locals = {
   table: 's3-photos-bucket-id',
 };
 
+debugAppVars('APP_LOCALS: ', {
+  filterApiUrl: app.locals.filterApiUrl,
+  photoApiUrl: app.locals.photoApiUrl,
+});
+
 // Get Or Create the S3 Bucket Id
 app.use(require('./middleware/getOrCreateS3BucketId'));
 
@@ -58,5 +74,29 @@ app.post(
   require('./middleware/filterGreyscale'),
   require('./middleware/upload')
 );
+
+app.get('/debug/app-vars', (req, res) => {
+  res.json({
+    ENV_VARS: {
+      PORT: process.env.PORT,
+      FILTER_HOST: process.env.FILTER_HOST,
+      FILTER_PORT: process.env.FILTER_PORT,
+      STORAGE_HOST: process.env.STORAGE_HOST,
+      STORAGE_PORT: process.env.STORAGE_PORT,
+      AWS_REGION: process.env.AWS_REGION,
+      DEBUG: process.env.DEBUG,
+    },
+    EXTERNAL_HOSTS_PORTS: {
+      filterHost,
+      filterPort,
+      storageHost,
+      storagePort,
+    },
+    APP_LOCALS: {
+      filterApiUrl: app.locals.filterApiUrl,
+      photoApiUrl: app.locals.photoApiUrl,
+    },
+  });
+});
 
 module.exports = app;

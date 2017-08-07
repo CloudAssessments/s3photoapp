@@ -11,6 +11,8 @@
   limitations under the License.
 */
 
+const debugError = require('debug')('ERROR');
+
 module.exports = (req, res, next) => {
   const item = {
     Item: {
@@ -41,6 +43,7 @@ module.exports = (req, res, next) => {
         });
       }
 
+      debugError('DYNAMO PUT ITEM: ', err);
       return Promise.reject(err);
     })
 
@@ -50,6 +53,7 @@ module.exports = (req, res, next) => {
     })
 
     .catch((err) => {
+      debugError('DYNAMO GET ITEM: ', err);
       const errJson = {
         code: err.code,
         message: err.message,
