@@ -22,3 +22,5 @@ script:
   - docker-compose run photo-filter npm run test
   - docker-compose run photo-storage npm run lint .
   - docker-compose run photo-storage npm run test
+  - docker-compose run s3-empty-bucket npm run lint .
+  - docker-compose run s3-empty-bucket npm run test

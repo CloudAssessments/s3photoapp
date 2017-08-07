@@ -9,8 +9,13 @@ A multi-project repo of services that work together to form a demo to enable use
 ## About this project
 This project is composed of independent Node.js services:
 - web-client: a front-end client for viewing and storing images
+  - Production Entry Point: `npm run prod`
 - photo-filter: a REST API for applying filters to a given image
+  - Production Entry Point: `npm run prod`
 - photo-storage: a REST API for creating, reading, and deleting images in Amazon S3
+  - Production Entry Point: `npm run prod`
+- s3-empty-bucket: a one-time script to empty the S3 Bucket used in this project
+  - Production Entry Point: `npm run prod`
 
 
 ## Development Installation
@@ -38,13 +43,13 @@ This project is composed of independent Node.js services:
   - Description: The port number to listen on
 - `FILTER_HOST`:
   - Default: "localhost"
-  - Description: The host name of the url that the `photo-filter` service is listening on.
+  - Description: The host name of the url that the `photo-filter` service is listening on. _Note: This should not include the `http://` as the app will add it itself_
 - `FILTER_PORT`:
   - Default: "3002"
   - Description: The port number of the url that the `photo-filter` service is listening on.
 - `STORAGE_HOST`:
   - Default: "localhost"
-  - Description: The host name of the url that the `photo-storage` service is listening on.
+  - Description: The host name of the url that the `photo-storage` service is listening on. _Note: This should not include the `http://` as the app will add it itself_
 - `STORAGE_PORT`:
   - Default: "3001"
   - Description: The port number of the url that the `photo-filter` service is listening on.
@@ -67,3 +72,11 @@ This project is composed of independent Node.js services:
 - `AWS_REGION`:
   - Default: "us-east-1"
   - Description: The region to send AWS S3 Requests to
+
+**s3-empty-bucket:**
+- `AWS_REGION`:
+  - Default: "us-east-1"
+  - Description: The region to send AWS S3 Requests to
+- `STAGE`:
+  - Default: "dev"
+  - Description: The deployment environment
