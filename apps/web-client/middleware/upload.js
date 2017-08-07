@@ -11,10 +11,14 @@
   limitations under the License.
 */
 
+const debugAppVars = require('debug')('APP_VARS');
+
 module.exports = (req, res) => {
   const bucket = req.app.locals.s3Bucket;
   const photoName = res.locals.image.name;
   const uploadUrl = `${req.app.locals.photoApiUrl}/bucket/${bucket}/photos/${photoName}`;
+
+  debugAppVars('UPLOAD_URL: ', uploadUrl);
 
   const redirect = err => (err ?
     res.redirect(`/?err=${err}`) :

@@ -10,10 +10,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+const debugAppVars = require('debug')('APP_VARS');
 
 module.exports = (req, res) => {
   // eslint-disable-next-line max-len
   const getPhotosUrl = `${req.app.locals.photoApiUrl}/bucket/${req.app.locals.s3Bucket}/photos`;
+
+  debugAppVars('GET_PHOTOS_URL: ', getPhotosUrl);
 
   const renderHomepage = (ctx) => {
     res.render('index', Object.assign(

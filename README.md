@@ -51,6 +51,10 @@ This project is composed of independent Node.js services:
 - `AWS_REGION`:
   - Default: "us-east-1"
   - Description: The region to send AWS S3 Requests to
+- `DEBUG`
+  - Default: none
+  - Description: Print logs of a specified type for debugging purposes
+  - Possible Values: none, 'APP_VARS', '*'
 
 **photo-filter:**
 - `PORT`:
