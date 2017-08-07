@@ -9,4 +9,4 @@ WORKDIR /app
 ADD . /app
 
 # Install node deps for each app
-RUN npm install --quiet
+RUN make install
