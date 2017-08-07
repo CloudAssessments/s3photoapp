@@ -13,12 +13,12 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const del = require('../../routes/delete.js');
+const assertBucket = require('../../middleware/assertBucket.js');
 
 const verifyMocks = (t) => {
+  t.context.mockS3Store.assertBucket.verify();
   t.context.mockRes.status.verify();
-  t.context.mockRes.json.verify();
-  t.context.mockS3Store.deletePhoto.verify();
+  t.context.mockRes.json.verify(); // kinda weird how this one works, but it does!
 };
 
 test.beforeEach((t) => {
@@ -26,18 +26,17 @@ test.beforeEach((t) => {
   t.context.mockRes = {
     status: sinon.mock(),
     json: sinon.mock(),
-    send: sinon.mock(),
   };
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockS3Store = {
-    deletePhoto: sinon.mock(),
+    assertBucket: sinon.mock(),
   };
 });
 
-test.cb('should return url if bucket and photo exists', (t) => {
+test.cb('should call next if bucket is successfully created', (t) => {
   const req = {
-    params: { bucket: 'testBucket', photo: 'testPhoto' },
+    params: { bucket: 'testBucket' },
     app: {
       locals: {
         s3Store: t.context.mockS3Store,
@@ -45,70 +44,62 @@ test.cb('should return url if bucket and photo exists', (t) => {
     },
   };
 
-  t.context.mockS3Store.deletePhoto
-    .once()
-    .withArgs('testBucket', 'testPhoto')
-    .resolves({});
+  const next = () => {
+    t.pass();
+    t.end();
+  };
 
-  t.context.mockRes.status
+  t.context.mockS3Store.assertBucket
     .once()
-    .withArgs(204)
-    .returns(t.context.mockRes);
+    .withArgs(req.params.bucket)
+    .resolves({ Location: 'www.aws.s3/testBucket.com' });
 
+  t.context.mockRes.status.never();
   t.context.mockRes.json.never();
 
-  t.context.mockRes.send
-    .once()
-    .callsFake((response) => {
-      t.is(response, undefined);
-      verifyMocks(t);
-      t.end();
-    });
-
-  del(req, t.context.mockRes);
+  assertBucket(req, t.context.mockRes, next);
 });
 
-test.cb('should surface s3 errors if thrown', (t) => {
+test.cb('should return S3 errors if they exist', (t) => {
+  const req = {
+    params: { bucket: 'testBucket' },
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
+    },
+  };
+
   const s3Error = {
     statusCode: 403,
     code: 'InvalidAccessKeyId',
     message: 'The AWS Access Key Id you provided does not exist in our records.',
   };
 
-  const req = {
-    params: { bucket: 'testBucket', photo: 'testPhoto' },
-    app: {
-      locals: {
-        s3Store: t.context.mockS3Store,
-      },
-    },
-  };
-
-  t.context.mockS3Store.deletePhoto
+  t.context.mockS3Store.assertBucket
     .once()
-    .withArgs('testBucket', 'testPhoto')
+    .withArgs(req.params.bucket)
     .rejects(s3Error);
 
   t.context.mockRes.status
     .once()
-    .withArgs(s3Error.statusCode)
+    .withArgs(403)
     .returns(t.context.mockRes);
 
   t.context.mockRes.json
     .once()
-    .callsFake((response) => {
-      t.is(response.code, s3Error.code);
-      t.is(response.message, s3Error.message);
+    .withArgs({ code: s3Error.code, message: s3Error.message })
+    .callsFake(() => {
       verifyMocks(t);
       t.end();
     });
 
-  del(req, t.context.mockRes);
+  assertBucket(req, t.context.mockRes);
 });
 
-test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
+test.cb('should return 500 statusCode if unexpected error thrown', (t) => {
   const req = {
-    params: { bucket: 'testBucket', photo: 'testPhoto' },
+    params: { bucket: 'testBucket' },
     app: {
       locals: {
         s3Store: t.context.mockS3Store,
@@ -116,10 +107,10 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
     },
   };
 
-  t.context.mockS3Store.deletePhoto
+  t.context.mockS3Store.assertBucket
     .once()
-    .withArgs('testBucket', 'testPhoto')
-    .rejects(new Error('oops'));
+    .withArgs(req.params.bucket)
+    .rejects(new Error('foo'));
 
   t.context.mockRes.status
     .once()
@@ -128,11 +119,11 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
 
   t.context.mockRes.json
     .once()
-    .callsFake((response) => {
-      t.is(response.code, 'InternalServerError');
+    .withArgs({ code: 'InternalServerError' })
+    .callsFake(() => {
       verifyMocks(t);
       t.end();
     });
 
-  del(req, t.context.mockRes);
+  assertBucket(req, t.context.mockRes);
 });

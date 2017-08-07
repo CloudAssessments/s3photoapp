@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const greyscale = require('../../routes/greyscale.js');
+const greyscale = require('../../middleware/greyscale.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.send.verify();

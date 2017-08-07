@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const listUrls = require('../../routes/listUrls.js');
+const listUrls = require('../../middleware/listUrls.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();

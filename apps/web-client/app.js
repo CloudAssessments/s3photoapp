@@ -46,15 +46,15 @@ app.locals = {
 app.use(require('./middleware/getOrCreateS3BucketId'));
 
 // Routes: Homepage
-app.get('/', require('./routes/homepage'));
+app.get('/', require('./middleware/homepage'));
 
 // Routes: Upload Image
 app.post(
   '/photo',
   multer.single('uploadedImage'),
-  require('./routes/multipartToImage'),
-  require('./routes/filterGreyscale'),
-  require('./routes/upload')
+  require('./middleware/multipartToImage'),
+  require('./middleware/filterGreyscale'),
+  require('./middleware/upload')
 );
 
 module.exports = app;
