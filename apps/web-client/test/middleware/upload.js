@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const upload = require('../../routes/upload.js');
+const upload = require('../../middleware/upload.js');
 
 const testBucket = 'testBucket';
 

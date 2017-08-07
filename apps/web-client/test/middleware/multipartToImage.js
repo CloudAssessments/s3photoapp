@@ -13,7 +13,7 @@
 
 const { test } = require('ava');
 const sinon = require('sinon');
-const multipartToImage = require('../../routes/multipartToImage.js');
+const multipartToImage = require('../../middleware/multipartToImage.js');
 
 const verifyMocks = (t) => {
   t.context.mockRes.redirect.verify();
