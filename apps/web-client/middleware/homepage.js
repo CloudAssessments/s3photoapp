@@ -10,7 +10,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-const debugAppVars = require('debug')('APP_VARS');
+
+const debug = require('debug');
+
+const debugAppVars = debug('APP_VARS');
+const debugError = debug('ERRORS');
 
 module.exports = (req, res) => {
   // eslint-disable-next-line max-len
@@ -43,6 +47,7 @@ module.exports = (req, res) => {
     }
 
     if (err) {
+      debugError('GET PHOTOS REQUEST: ', err);
       return renderHomepage({ err });
     }
 
@@ -50,6 +55,7 @@ module.exports = (req, res) => {
       try {
         bodyJson = JSON.parse(body);
       } catch (e) {
+        debugError('GET PHOTOS REQUEST BODY PARSING: ', e);
         return renderHomepage({
           err: JSON.stringify({
             code: 'ParseError',

@@ -11,7 +11,10 @@
   limitations under the License.
 */
 
-const debugAppVars = require('debug')('APP_VARS');
+const debug = require('debug');
+
+const debugAppVars = debug('APP_VARS');
+const debugError = debug('ERRORS');
 
 module.exports = (req, res) => {
   const bucket = req.app.locals.s3Bucket;
@@ -44,6 +47,7 @@ module.exports = (req, res) => {
     }
 
     if (err) {
+      debugError('UPLOAD PHOTO REQUEST: ', err);
       return redirect(JSON.stringify({
         name: err.name,
         message: err.message,
