@@ -24,7 +24,7 @@ module.exports = (req, res) => {
     Key: req.params.photoName,
   };
 
-  req.deps.s3Store.uploadPhoto(req.params.bucket, params)
+  req.app.locals.s3Store.uploadPhoto(req.params.bucket, params)
     .then((result) => {
       res.json({
         bucket: result.Bucket,

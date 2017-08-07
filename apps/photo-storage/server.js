@@ -20,6 +20,8 @@ const PORT = process.env.API_PORT || 3001;
 const validMimeTypes = ['image/bmp', 'image/jpeg', 'image/png'];
 const isValidImageMimeType = req => validMimeTypes.includes(req.headers['content-type']);
 
+app.locals = { s3Store };
+
 app.use(bodyParser.raw({ limit: '10mb', type: isValidImageMimeType }));
 
 app.use((err, req, res, next) => {
@@ -27,11 +29,6 @@ app.use((err, req, res, next) => {
     return res.status(413).json({ code: 'EntityTooLarge' });
   }
 
-  next();
-});
-
-app.use((req, res, next) => {
-  req.deps = { s3Store };
   next();
 });
 

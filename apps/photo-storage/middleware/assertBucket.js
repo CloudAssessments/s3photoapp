@@ -12,7 +12,7 @@
 */
 
 module.exports = (req, res, next) => {
-  req.deps.s3Store.assertBucket(req.params.bucket)
+  req.app.locals.s3Store.assertBucket(req.params.bucket)
     .then(() => next())
     .catch((e) => {
       if (e.statusCode && e.code && e.message) {

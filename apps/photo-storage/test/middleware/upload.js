@@ -18,7 +18,7 @@ const upload = require('../../middleware/upload.js');
 const verifyMocks = (t) => {
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockReq.deps.s3Store.uploadPhoto.verify();
+  t.context.mockReq.app.locals.s3Store.uploadPhoto.verify();
 };
 
 test.beforeEach((t) => {
@@ -30,9 +30,11 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq = {
-    deps: {
-      s3Store: {
-        uploadPhoto: sinon.mock(),
+    app: {
+      locals: {
+        s3Store: {
+          uploadPhoto: sinon.mock(),
+        },
       },
     },
     body: new Buffer('foo'),
@@ -52,7 +54,7 @@ test.cb('should return upload details on success', (t) => {
     location: `www.aws.s3/${req.params.bucket}/${req.params.photoName}.com`,
   };
 
-  t.context.mockReq.deps.s3Store.uploadPhoto
+  t.context.mockReq.app.locals.s3Store.uploadPhoto
     .once()
     .withArgs(uploadRes.Bucket, { Body: t.context.mockReq.body, Key: uploadRes.key })
     .resolves(uploadRes);
@@ -81,7 +83,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
     message: 'The AWS Access Key Id you provided does not exist in our records.',
   };
 
-  t.context.mockReq.deps.s3Store.uploadPhoto
+  t.context.mockReq.app.locals.s3Store.uploadPhoto
     .once()
     .withArgs(req.params.bucket, {
       Body: new Buffer(t.context.mockReq.body),
@@ -109,7 +111,7 @@ test.cb('should surface s3 errors if thrown', (t) => {
 test.cb('should return validation error if buffer is invalid', (t) => {
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq.body = null;
-  t.context.mockReq.deps.s3Store.uploadPhoto.never();
+  t.context.mockReq.app.locals.s3Store.uploadPhoto.never();
 
   t.context.mockRes.status
     .once()
@@ -131,7 +133,7 @@ test.cb('should return 500 statusCode if unexpected rejected error', (t) => {
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq.params = { bucket: 'testBucket' };
 
-  t.context.mockReq.deps.s3Store.uploadPhoto
+  t.context.mockReq.app.locals.s3Store.uploadPhoto
     .once()
     .rejects(new Error('foo'));
 

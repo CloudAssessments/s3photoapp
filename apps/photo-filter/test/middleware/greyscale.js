@@ -19,7 +19,7 @@ const verifyMocks = (t) => {
   t.context.mockRes.send.verify();
   t.context.mockRes.status.verify();
   t.context.mockRes.json.verify();
-  t.context.mockReq.deps.jimp.read.verify();
+  t.context.mockReq.app.locals.jimp.read.verify();
 };
 
 test.beforeEach((t) => {
@@ -32,10 +32,12 @@ test.beforeEach((t) => {
 
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq = {
-    deps: {
-      jimp: {
-        read: sinon.mock(),
-        AUTO: 'auto',
+    app: {
+      locals: {
+        jimp: {
+          read: sinon.mock(),
+          AUTO: 'auto',
+        },
       },
     },
     body: new Buffer('foo'),
@@ -59,7 +61,7 @@ test.cb('should return apply greyscale filter to given image buffer', (t) => {
       cb(null, new Buffer('gray-foo'));
     });
 
-  t.context.mockReq.deps.jimp.read
+  t.context.mockReq.app.locals.jimp.read
     .once()
     .callsFake((buffer, cb) => {
       t.is(buffer.toString(), 'foo');
@@ -97,7 +99,7 @@ test.cb('should return error if could not get buffer for filtered image', (t) =>
       cb(new Error('oops'));
     });
 
-  t.context.mockReq.deps.jimp.read
+  t.context.mockReq.app.locals.jimp.read
     .once()
     .callsFake((buffer, cb) => {
       t.is(buffer.toString(), 'foo');
@@ -127,7 +129,7 @@ test.cb('should return error if could not get buffer for filtered image', (t) =>
 });
 
 test.cb('should return error if image buffer cannot be read', (t) => {
-  t.context.mockReq.deps.jimp.read
+  t.context.mockReq.app.locals.jimp.read
     .once()
     .callsFake((buffer, cb) => {
       t.is(buffer.toString(), 'foo');
@@ -158,7 +160,7 @@ test.cb('should return error if body is invalid', (t) => {
   // eslint-disable-next-line no-param-reassign
   t.context.mockReq.body = undefined;
 
-  t.context.mockReq.deps.jimp.read.never();
+  t.context.mockReq.app.locals.jimp.read.never();
   t.context.mockRes.send.never();
 
   t.context.mockRes.status

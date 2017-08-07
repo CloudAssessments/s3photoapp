@@ -19,7 +19,7 @@ module.exports = (req, res) => {
     });
   }
 
-  req.deps.jimp.read(req.body, (err, image) => {
+  req.app.locals.jimp.read(req.body, (err, image) => {
     if (err) {
       return res.status(500).json({
         code: 'InternalServerError',
@@ -28,7 +28,7 @@ module.exports = (req, res) => {
       });
     }
 
-    image.greyscale().getBuffer(req.deps.jimp.AUTO, (bufferErr, buffer) => {
+    image.greyscale().getBuffer(req.app.locals.jimp.AUTO, (bufferErr, buffer) => {
       if (bufferErr) {
         return res.status(500).json({
           code: 'InternalServerError',

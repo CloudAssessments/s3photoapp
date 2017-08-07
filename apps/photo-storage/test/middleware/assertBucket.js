@@ -37,8 +37,10 @@ test.beforeEach((t) => {
 test.cb('should call next if bucket is successfully created', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -61,8 +63,10 @@ test.cb('should call next if bucket is successfully created', (t) => {
 test.cb('should return S3 errors if they exist', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
@@ -96,8 +100,10 @@ test.cb('should return S3 errors if they exist', (t) => {
 test.cb('should return 500 statusCode if unexpected error thrown', (t) => {
   const req = {
     params: { bucket: 'testBucket' },
-    deps: {
-      s3Store: t.context.mockS3Store,
+    app: {
+      locals: {
+        s3Store: t.context.mockS3Store,
+      },
     },
   };
 
