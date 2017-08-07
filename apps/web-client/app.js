@@ -23,7 +23,9 @@ const app = express();
 const dynamodb = new DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const filterHost = process.env.FILTER_HOST || 'localhost';
+const filterPort = process.env.FILTER_PORT || '3002';
 const storageHost = process.env.STORAGE_HOST || 'localhost';
+const storagePort = process.env.STORAGE_PORT || '3001';
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,8 +39,8 @@ app.locals = {
   request,
   uuid,
   dynamodb,
-  filterApiUrl: `http://${filterHost}:${process.env.FILTER_PORT}`,
-  photoApiUrl: `http://${storageHost}:${process.env.STORAGE_PORT}`,
+  filterApiUrl: `http://${filterHost}:${filterPort}`,
+  photoApiUrl: `http://${storageHost}:${storagePort}`,
   table: 's3-photos-bucket-id',
 };
 

@@ -46,7 +46,7 @@ This project is composed of independent Node.js services:
   - Default: "localhost"
   - Description: The host name of the url that the `photo-storage` service is listening on.
 - `STORAGE_PORT`:
-  - Default: "3002"
+  - Default: "3001"
   - Description: The port number of the url that the `photo-filter` service is listening on.
 - `AWS_REGION`:
   - Default: "us-east-1"
