@@ -75,4 +75,28 @@ app.post(
   require('./middleware/upload')
 );
 
+app.get('/debug/app-vars', (req, res) => {
+  res.json({
+    ENV_VARS: {
+      PORT: process.env.PORT,
+      FILTER_HOST: process.env.FILTER_HOST,
+      FILTER_PORT: process.env.FILTER_PORT,
+      STORAGE_HOST: process.env.STORAGE_HOST,
+      STORAGE_PORT: process.env.STORAGE_PORT,
+      AWS_REGION: process.env.AWS_REGION,
+      DEBUG: process.env.DEBUG,
+    },
+    EXTERNAL_HOSTS_PORTS: {
+      filterHost,
+      filterPort,
+      storageHost,
+      storagePort,
+    },
+    APP_LOCALS: {
+      filterApiUrl: app.locals.filterApiUrl,
+      photoApiUrl: app.locals.photoApiUrl,
+    },
+  });
+});
+
 module.exports = app;
