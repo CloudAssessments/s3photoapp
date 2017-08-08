@@ -20,5 +20,5 @@ module.exports = s3 => (bucket, items, cursor) => {
     cursor ? { StartAfter: cursor } : {}
   );
 
-  return s3.deleteObjects(params).promise()
+  return s3.deleteObjects(params).promise();
 };
