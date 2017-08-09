@@ -15,3 +15,8 @@ services:
       context: ./apps/photo-storage
       dockerfile: Dockerfile
     image: s3-photos/photo-storage:prod
+  s3-empty-bucket:
+    build:
+      context: ./apps/s3-empty-bucket
+      dockerfile: Dockerfile
+    image: s3-photos/s3-empty-bucket:prod

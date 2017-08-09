@@ -1,0 +1,32 @@
+{
+  "name": "s3-empty-bucket",
+  "version": "0.0.0",
+  "description": "A script to empty an S3 bucket",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf coverage .nyc_output node_modules",
+    "dev": "node scripts/empty-s3-bucket.js",
+    "lint": "eslint",
+    "prod": "STAGE=prod node scripts/empty-s3-bucket.js",
+    "test": "nyc -r text -r html ava -T 300000"
+  },
+  "keywords": [
+    "s3",
+    "empty",
+    "bucket",
+    "script"
+  ],
+  "author": "jonathan lee <jonl@linuxacademy.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-sdk": "^2.94.0"
+  },
+  "devDependencies": {
+    "ava": "^0.21.0",
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-import": "^2.7.0",
+    "nyc": "^11.0.3",
+    "sinon": "^2.4.1"
+  }
+}
