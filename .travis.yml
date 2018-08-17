@@ -16,9 +16,9 @@ before_install:
 install:
   - docker-compose build
 script:
-  - docker-compose run web-client npm run lint .
-  - docker-compose run web-client npm run test
-  - docker-compose run photo-filter npm run lint .
-  - docker-compose run photo-filter npm run test
-  - docker-compose run photo-storage npm run lint .
-  - docker-compose run photo-storage npm run test
+  - docker-compose run --no-deps --entrypoint "npm run lint ." web-client
+  - docker-compose run --no-deps --entrypoint "npm run test" web-client
+  - docker-compose run --no-deps --entrypoint "npm run lint ." photo-filter
+  - docker-compose run --no-deps --entrypoint "npm run test" photo-filter
+  - docker-compose run --no-deps --entrypoint "npm run lint ." photo-storage
+  - docker-compose run --no-deps --entrypoint "npm run test" photo-storage
