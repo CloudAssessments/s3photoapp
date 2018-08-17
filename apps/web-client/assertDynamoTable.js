@@ -32,7 +32,9 @@ module.exports = (dynamodb, table) => {
     TableName: table,
   };
 
-  return dynamodb.createTable(TableDef).promise()
+  return dynamodb
+    .createTable(TableDef)
+    .promise()
     .catch((err) => {
       /* istanbul ignore next */
       if (err.message.includes('Table already exists')) {
@@ -45,7 +47,7 @@ module.exports = (dynamodb, table) => {
         err
       );
 
-      /* istanbul ignore next */ 
+      /* istanbul ignore next */
       process.exit(1);
     });
 };
