@@ -24,8 +24,6 @@ const app = express();
 const debugAppVars = debug('APP_VARS');
 const dynamodb = new DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
 
-console.log('debugT1', process.env);
-
 debugAppVars('PROCESS.ENV: ', process.env);
 
 const filterHost =
